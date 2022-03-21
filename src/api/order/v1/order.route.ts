@@ -4,14 +4,16 @@ import { orderGetAllHandler } from './handler/order.getAll';
 import { orderGetByIdHandler } from './handler/order.getById';
 import { orderPostHandler } from './handler/order.post';
 import { orderPutByIdHandler } from './handler/order.putById';
-import { orderGetByTrackingNumberHandler} from './handler/order.getByTrackingNumber'
+import { orderGetByTrackingNumberHandler } from './handler/order.getByTrackingNumber';
+import { orderGetByUpdatedAtHandler } from './handler/order.getByUpdatedAt';
 import {
   orderDelByIdValidator,
   orderGetAllValidator,
   orderGetByIdValidator,
   orderPostValidator,
   orderPutByIdValidator,
-  orderGetByTrackingNumberValidator
+  orderGetByTrackingNumberValidator,
+  orderGetByUpdatedAtValidator,
 } from './order.validator';
 
 export const routes: CommonRoute[] = [
@@ -28,6 +30,13 @@ export const routes: CommonRoute[] = [
     auth: true,
     validator: orderGetByIdValidator,
     handler: orderGetByIdHandler,
+  },
+  {
+    path: '/orders/updatedAt/:updatedAt',
+    method: 'get',
+    auth: true,
+    validator: orderGetByUpdatedAtValidator,
+    handler: orderGetByUpdatedAtHandler,
   },
   {
     path: '/orders/track/:trackingNumber',
@@ -56,5 +65,5 @@ export const routes: CommonRoute[] = [
     auth: true,
     validator: orderDelByIdValidator,
     handler: orderDelByIdHandler,
-  }
+  },
 ];

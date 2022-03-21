@@ -30,43 +30,69 @@ export const orderGetByTrackingNumberValidator = celebrate({
   },
 });
 
+export const orderGetByUpdatedAtValidator = celebrate({
+  params: {
+    updatedAt: Joi.string().required(),
+  },
+});
+
 export const orderPostValidator = celebrate({
   body: {
     MAWB: Joi.string()
       .max(50)
-      .required(),
-    containerNumber: Joi.string().required(),
+      .default('')
+      .allow(''),
+    containerNumber: Joi.string()
+      .default('')
+      .allow(''),
     trackingNumber: Joi.string().required(),
-    shipper: Joi.string().required(),
-    shipperPhoneNumber: Joi.string().required(),
-    shipperAddress: Joi.string().required(),
+    shipper: Joi.string()
+      .default('')
+      .allow(''),
+    shipperPhoneNumber: Joi.string()
+      .default('')
+      .allow(''),
+    shipperAddress: Joi.string()
+      .default('')
+      .allow(''),
     destinationCountry: Joi.string().required(),
     recipient: Joi.string().required(),
-    RUT: Joi.string().required(),
+    RUT: Joi.string()
+      .default('')
+      .allow(''),
     recipientPhoneNumber: Joi.string().required(),
     recipientEmail: Joi.string()
       .email()
-      .required(),
+      .default('')
+      .allow(''),
     region: Joi.string()
       .default('')
-      .allow(''),
+      .allow('')
+      .required(),
     province: Joi.string()
       .default('')
-      .allow(''),
+      .allow('')
+      .required(),
     comuna: Joi.string()
       .default('')
-      .allow(''),
+      .allow('')
+      .required(),
     address: Joi.string().required(),
     weight: Joi.number()
       .positive()
-      .required(),
+      .allow(0)
+      .default(0),
     value: Joi.number()
       .positive()
-      .required(),
+      .allow(0)
+      .default(0),
     quantity: Joi.number()
       .positive()
-      .required(),
-    description: Joi.string(),
+      .allow(0)
+      .default(0),
+    description: Joi.string()
+      .default('')
+      .allow(''),
   },
 });
 
@@ -83,39 +109,59 @@ export const orderPutByIdValidator = celebrate({
       .positive(),
     MAWB: Joi.string()
       .max(50)
-      .required(),
-    containerNumber: Joi.string().required(),
+      .default('')
+      .allow(''),
+    containerNumber: Joi.string()
+      .default('')
+      .allow(''),
     trackingNumber: Joi.string().required(),
-    shipper: Joi.string().required(),
-    shipperPhoneNumber: Joi.string().required(),
-    shipperAddress: Joi.string().required(),
+    shipper: Joi.string()
+      .default('')
+      .allow(''),
+    shipperPhoneNumber: Joi.string()
+      .default('')
+      .allow(''),
+    shipperAddress: Joi.string()
+      .default('')
+      .allow(''),
     destinationCountry: Joi.string().required(),
     recipient: Joi.string().required(),
-    RUT: Joi.string().required(),
+    RUT: Joi.string()
+      .default('')
+      .allow(''),
     recipientPhoneNumber: Joi.string().required(),
     recipientEmail: Joi.string()
       .email()
-      .required(),
+      .default('')
+      .allow(''),
     region: Joi.string()
       .default('')
-      .allow(''),
+      .allow('')
+      .required(),
     province: Joi.string()
       .default('')
-      .allow(''),
+      .allow('')
+      .required(),
     comuna: Joi.string()
       .default('')
-      .allow(''),
+      .allow('')
+      .required(),
     address: Joi.string().required(),
     weight: Joi.number()
       .positive()
-      .required(),
+      .allow(0)
+      .default(0),
     value: Joi.number()
       .positive()
-      .required(),
+      .allow(0)
+      .default(0),
     quantity: Joi.number()
       .positive()
-      .required(),
-    description: Joi.string(),
+      .allow(0)
+      .default(0),
+    description: Joi.string()
+      .default('')
+      .allow(''),
   },
 });
 

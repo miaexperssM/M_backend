@@ -3,22 +3,22 @@ import { CommonEntity } from '../../utils/entity';
 
 @Entity('order')
 export class Order extends CommonEntity {
-  @Column()
+  @Column({ nullable: true })
   public MAWB: string;
 
-  @Column()
+  @Column({ nullable: true })
   public containerNumber: string;
 
   @Column({ unique: true, length: '300' })
   public trackingNumber: string;
 
-  @Column()
+  @Column({ nullable: true })
   public shipper: string;
 
-  @Column()
+  @Column({ nullable: true })
   public shipperPhoneNumber: string;
 
-  @Column()
+  @Column({ nullable: true })
   public shipperAddress: string;
 
   @Column()
@@ -27,37 +27,37 @@ export class Order extends CommonEntity {
   @Column()
   public recipient: string;
 
-  @Column()
+  @Column({ nullable: true })
   public RUT: string;
 
   @Column()
   public recipientPhoneNumber: string;
 
-  @Column()
+  @Column({ nullable: true })
   public recipientEmail: string;
 
-  @Column({ nullable: true })
+  @Column()
   public region: string;
 
-  @Column({ nullable: true })
+  @Column()
   public province: string;
 
-  @Column({ nullable: true })
+  @Column()
   public comuna: string;
 
   @Column()
   public address: string;
 
-  @Column('float')
+  @Column('float',{ nullable: true })
   public weight: number;
 
-  @Column('float')
+  @Column('float',{ nullable: true })
   public value: number;
 
-  @Column()
+  @Column({ nullable: true })
   public description: string;
 
-  @Column('float')
+  @Column('float',{ nullable: true })
   public quantity: number;
 
   @Column('boolean', { default: 0 })
