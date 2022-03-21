@@ -6,8 +6,8 @@ export const orderGetAllValidator = celebrate({
     limit: Joi.number()
       .integer()
       .min(1)
-      .max(100)
-      .default(10),
+      .max(1000)
+      .default(100),
     offset: Joi.number()
       .integer()
       .min(0)
