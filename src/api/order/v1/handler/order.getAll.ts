@@ -4,7 +4,7 @@ import { getConnection } from 'typeorm';
 
 interface OrderGetAllQuery {
   offset: number;
-  limit: number;
+  limit?: number;
 }
 
 export async function orderGetAllHandler(req: Request, res: Response, next: NextFunction) {
