@@ -10,8 +10,7 @@ export const zoneGetAllValidator = celebrate({
     limit: Joi.number()
       .integer()
       .min(1)
-      .max(100)
-      .default(100),
+      .max(10000),
     offset: Joi.number()
       .integer()
       .min(0)
