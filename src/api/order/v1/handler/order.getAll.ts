@@ -42,7 +42,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
       if (order.zoneId && order.zoneId !== 0) {
         const zone = zoneList.find((zone)=>zone.id === order.zoneId)
         console.log("get zone", zone.id)
-        resultList.push({ ...order, zone: zone || undefined });
+        resultList.push({ ...order, zone: {title: zone.title, description: zone.description} || undefined });
       } else {
         const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
         const orderLoactionArray = await geoCodeing(address);
@@ -56,7 +56,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
               placeIdInGoogle: orderLoactionJson.place_id,
             };
             await getRepository(Order).save(newOrder);
-            resultList.push({ ...order, zone, placeId: orderLoactionJson.place_id });
+            resultList.push({ ...order, zone: {title: zone.title, description: zone.description}, placeId: orderLoactionJson.place_id });
           } else {
             const newOrder = {
               ...order,

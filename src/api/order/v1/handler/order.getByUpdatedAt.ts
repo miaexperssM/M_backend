@@ -43,7 +43,10 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
       let result: any = order;
       if (order.zoneId && order.zoneId !== 0) {
         const zone = zoneList.find(zone => zone.id === order.zoneId);
-        result = { ...order, zone: zone || undefined };
+        result = {
+          ...order,
+          zone: { title: zone.title || undefined, description: zone.description || undefined } || undefined,
+        };
       } else {
         const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
         const orderLoactionArray = await geoCodeing(address);
@@ -58,7 +61,11 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
               placeIdInGoogle: orderLoactionJson.place_id,
             };
             await getRepository(Order).save(newOrder);
-            result = { ...order, zone, placeId: orderLoactionJson.place_id };
+            result = {
+              ...order,
+              zone: { title: zone.title, description: zone.description },
+              placeId: orderLoactionJson.place_id,
+            };
           } else {
             const newOrder = {
               ...order,
