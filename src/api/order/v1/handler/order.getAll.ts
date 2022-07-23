@@ -13,7 +13,7 @@ interface OrderGetAllQuery {
 export async function orderGetAllHandler(req: Request, res: Response, next: NextFunction) {
   const query: OrderGetAllQuery = req.query;
 
-  const maxLength = Math.min(query.limit || 100, 1000);
+  const maxLength = Math.min(query.limit || 100, 5000);
 
   const orderList = await getConnection()
     .createQueryBuilder()
@@ -34,19 +34,15 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
 
   const resultList: any[] = [];
 
-  console.log('orderList', orderList.length);
-
-  await Promise.all(
+  await Promise.resolve(
     orderList.map(async order => {
-      console.log('search order --- >>> ', order.id);
       if (order.zoneId && order.zoneId !== 0) {
-        const zone = zoneList.find((zone)=>zone.id === order.zoneId)
-        console.log("get zone", zone.id)
-        resultList.push({ ...order, zone: {title: zone.title, description: zone.description} || undefined });
+        const zone = zoneList.find(zone => zone.id === order.zoneId);
+        resultList.push({ ...order, zone: zone ? { title: zone.title, description: zone.description } : undefined });
       } else {
         const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
         const orderLoactionArray = await geoCodeing(address);
-        if (orderLoactionArray.length !== 0) {
+        if (orderLoactionArray && orderLoactionArray.length !== 0) {
           const orderLoactionJson = orderLoactionArray[0];
           const zone = await findZoneByGooglePosition(orderLoactionJson, zoneList);
           if (zone) {
@@ -56,7 +52,11 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
               placeIdInGoogle: orderLoactionJson.place_id,
             };
             await getRepository(Order).save(newOrder);
-            resultList.push({ ...order, zone: {title: zone.title, description: zone.description}, placeId: orderLoactionJson.place_id });
+            resultList.push({
+              ...order,
+              zone: { title: zone.title, description: zone.description },
+              placeId: orderLoactionJson.place_id,
+            });
           } else {
             const newOrder = {
               ...order,
@@ -73,8 +73,6 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
       }
     }),
   );
-
-  console.log("return -> ", resultList.length)
 
   res.status(200).json(resultList);
 }

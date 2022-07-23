@@ -11,7 +11,7 @@ export async function geoCodeing(place: string) {
     const response = await axios.get(url);
     if (response.status === 200 && response.data.status === 'OK') {
       return response.data.results;
-    } else return undefined;
+    } else return [];
   } catch (err) {
     console.log('geoCoding Error', err);
     return undefined;

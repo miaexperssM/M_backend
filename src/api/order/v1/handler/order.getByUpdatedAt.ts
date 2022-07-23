@@ -20,6 +20,8 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
     .select('order')
     .from(Order, 'order')
     .orderBy('id', 'DESC')
+    .where('isDeleted = :isDeleted', { isDeleted: false })
+    .take(10000)
     .getMany();
 
   const zoneList = await getConnection()
@@ -38,14 +40,14 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
   if (!result || result.length === 0) return sendError(404, 'order not found', next);
 
   const resultList = [];
-  await Promise.all(
+  await Promise.resolve(
     result.map(async order => {
       let result: any = order;
       if (order.zoneId && order.zoneId !== 0) {
         const zone = zoneList.find(zone => zone.id === order.zoneId);
         result = {
           ...order,
-          zone: { title: zone.title || undefined, description: zone.description || undefined } || undefined,
+          zone: zone ? { title: zone.title || undefined, description: zone.description || undefined } : undefined,
         };
       } else {
         const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
