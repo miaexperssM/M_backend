@@ -74,4 +74,7 @@ export class Order extends CommonEntity {
 
   @Column('int', { default: 0 })
   public queryedCount: number;
+
+  @Column({ type: 'timestamp' })
+  public expiredDate: Date;
 }
