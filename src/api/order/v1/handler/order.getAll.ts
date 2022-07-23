@@ -67,6 +67,12 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
             resultList.push({ ...order, zone: undefined, placeId: orderLoactionJson.place_id });
           }
         } else {
+          const newOrder = {
+            ...order,
+            zoneId: -1,
+            placeIdInGoogle: '',
+          };
+          await getRepository(Order).save(newOrder);
           console.log("haven't found location by Google");
           resultList.push({ ...order, zone: undefined, placeId: '' });
         }

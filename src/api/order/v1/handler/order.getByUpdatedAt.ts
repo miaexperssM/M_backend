@@ -78,8 +78,14 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
             result = { ...order, zone: undefined, placeId: orderLoactionJson.place_id };
           }
         } else {
+          const newOrder = {
+            ...order,
+            zoneId: -1,
+            placeIdInGoogle: '',
+          };
+          await getRepository(Order).save(newOrder);
           console.log("haven't found location by Google");
-          result = { ...order, zone: undefined, placeId: '' };
+          resultList.push({ ...order, zone: undefined, placeId: '' });
         }
       }
       resultList.push(result);
