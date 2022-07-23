@@ -4,80 +4,88 @@ import { createConnection } from 'typeorm';
 import { v4 } from 'uuid';
 
 let token: string;
-let postId: number;
+let orderId: number;
+let trackingNumber: string = v4();
 const random = v4();
 
-describe('Post API v1', () => {
+const mockOrder = {
+  MAWB: "MAWB",
+  containerNumber: "string",
+  trackingNumber: trackingNumber,
+  shipper: "string",
+  shipperPhoneNumber: "string",
+  shipperAddress: "string",
+  destinationCountry: "Chile",
+  recipient: "string",
+  RUT: trackingNumber,
+  recipientPhoneNumber: trackingNumber,
+  recipientEmail: trackingNumber,
+  region: "Metropolitana de Santiago",
+  province: "Santiago",
+  comuna: "Las Condes",
+  detailAddress: "Rosario Norte 410 92",
+  weight: 0,
+  value: 0,
+  description: "string",
+  quantity: 0
+}
+
+describe('Order API v1', () => {
   beforeAll(async () => {
     await createConnection();
-
     const res = await request(app)
       .post('/api/v1/signup')
       .set('Content-Type', 'application/json')
-      .send({ name: 'test', email: `${random}@test.com`, password: 'test', permissions:'admin' });
-
+      .send({ name: random, email: `${random}@test.com`, password: 'test', permissions:'admin' });
     token = res.body.access_token;
   });
 
-  describe('GET /api/v1/posts', () => {
-    test('should return all posts', async () => {
+  describe('GET /api/v1/orders', () => {
+    test('should return all orders', async () => {
       const res = await request(app)
-        .get('/api/v1/posts')
+        .get('/api/v1/orders')
         .set('Authorization', `Bearer ${token}`);
       expect(res.status).toBe(200);
     });
   });
 
-  describe('POST /api/v1/posts (application/json)', () => {
-    test('should create post and return post.id', async () => {
+  describe('POST /api/v1/addOrder (application/json)', () => {
+    test('should create order and return order.id', async () => {
       const res = await request(app)
-        .post('/api/v1/posts')
+        .post('/api/v1/addOrder')
         .set('Authorization', `Bearer ${token}`)
         .set('Content-Type', 'application/json')
-        .send({ title: 'title', text: 'text' });
+        .send(mockOrder);
       expect(res.status).toBe(201);
+
+      orderId = res.body.id;
     });
   });
 
-  describe('POST /api/v1/posts (multipart/form-data)', () => {
-    test('should create post with image and return post.id', async () => {
+  describe('GET /api/v1/orders/:id', () => {
+    test('should return one order', async () => {
       const res = await request(app)
-        .post('/api/v1/posts')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Content-Type', 'multipart/form-data')
-        .attach('photo', 'public/images/test.png')
-        .field('title', 'title')
-        .field('text', 'text');
-      expect(res.status).toBe(201);
-
-      postId = res.body.id;
-    });
-  });
-
-  describe('GET /api/v1/posts/:id', () => {
-    test('should return one post', async () => {
-      const res = await request(app)
-        .get(`/api/v1/posts/${postId}`)
+        .get(`/api/v1/orders/${orderId}`)
         .set('Authorization', `Bearer ${token}`);
       expect(res.status).toBe(200);
     });
   });
 
-  describe('PUT /api/v1/posts/:id', () => {
-    test('should update post and return post.id', async () => {
+  describe('PUT /api/v1/orders/:id', () => {
+    test('should update order and return order.id', async () => {
       const res = await request(app)
-        .put(`/api/v1/posts/${postId}`)
+        .put(`/api/v1/orders/${orderId}`)
         .set('Authorization', `Bearer ${token}`)
         .set('Content-Type', 'application/json')
-        .send({ title: 'title', text: 'text' });
+        .send({ ...mockOrder, value: 1 });
       expect(res.status).toBe(200);
     });
   });
 
-  describe('DELETE /api/v1/posts/:id', () => {
+  describe('DELETE /api/v1/orders/:id', () => {
     test('should return OK status', async () => {
       const res = await request(app)
-        .del(`/api/v1/posts/${postId}`)
+        .del(`/api/v1/orders/${orderId}`)
         .set('Authorization', `Bearer ${token}`);
       expect(res.status).toBe(200);
     });

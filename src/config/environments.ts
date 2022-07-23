@@ -9,6 +9,8 @@ const DB_PASSWORD_DATA = existsSync(DB_PASSWORD_FILE) ? readFileSync(DB_PASSWORD
 const JWT_SECRET_FILE = process.env.JWT_SECRET_FILE || undefined;
 const JWT_SECRET_DATA = existsSync(JWT_SECRET_FILE) ? readFileSync(JWT_SECRET_FILE, 'utf8').trim() : undefined;
 
+export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
+
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 export const PORT = Number(process.env.PORT) || 3002;
 

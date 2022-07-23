@@ -1,11 +1,15 @@
 import { Order } from 'api/order/order.entity';
 import { NextFunction, Request, Response } from 'express';
-import { getRepository } from 'typeorm';
 import sendError from 'utils/error';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
+import dayjs from 'dayjs';
+import { geoCodeing } from 'utils/googleService';
+import { Zone } from 'api/zone/zone.entity';
+import { findZoneByGooglePosition } from 'utils/calculationHelper';
 
 interface OrderGetByUpdatedAtParams {
-  updatedAt: string;
+  from: string;
+  to: string;
 }
 
 export async function orderGetByUpdatedAtHandler(req: Request, res: Response, next: NextFunction) {
@@ -18,24 +22,55 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
     .orderBy('id', 'DESC')
     .getMany();
 
-  const timeArray = params.updatedAt.split('-');
-  const date = timeArray[0];
-  const month = timeArray[1];
-  const year = timeArray[2];
-
-  console.log('test', timeArray);
-  console.log('BASE date', orderList[0].updatedAt.getDate());
-  console.log('BASE month', orderList[0].updatedAt.getMonth());
-  console.log('BASE year', orderList[0].updatedAt.getFullYear());
+  const startDate = dayjs(params.from);
+  const endDate = dayjs(params.to);
 
   const result = orderList.filter(
-    order =>
-      order.updatedAt.getDate() === parseInt(date) &&
-      order.updatedAt.getMonth() + 1 === parseInt(month) &&
-      order.updatedAt.getFullYear() === parseInt(year),
+    order => dayjs(order.updatedAt.valueOf()).isAfter(startDate) && dayjs(order.updatedAt.valueOf()).isBefore(endDate),
+  );
+  if (!result || result.length === 0) return sendError(404, 'order not found', next);
+
+  const resultList = [];
+  await Promise.all(
+    result.map(async order => {
+      let result: any = order;
+      if (order.zoneId && order.zoneId !== 0) {
+        const zone = await getRepository(Zone).findOne({ id: order.zoneId, isDeleted: false });
+        result = { ...order, zone: zone || undefined };
+      } else {
+        const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
+        const orderLoactionArray = await geoCodeing(address);
+
+        if (orderLoactionArray.length !== 0) {
+          const orderLoactionJson = orderLoactionArray[0];
+          const zone = await findZoneByGooglePosition(orderLoactionJson);
+          if (zone) {
+            const newOrder = {
+              ...order,
+              zoneId: zone.id,
+              placeIdInGoogle: orderLoactionArray.place_id,
+            };
+            console.log('got', newOrder);
+            await getRepository(Order).save(newOrder);
+            result = { ...order, zone, placeId: orderLoactionJson.place_id };
+          } else {
+            const newOrder = {
+              ...order,
+              zoneId: -1,
+              placeIdInGoogle: orderLoactionArray.place_id,
+            };
+            console.log('no got', newOrder);
+            await getRepository(Order).save(newOrder);
+            result = { ...order, zone: undefined, placeId: orderLoactionJson.place_id };
+          }
+        } else {
+          console.log("haven't found location by Google");
+          result = { ...order, zone: undefined, placeId: -1 };
+        }
+      }
+      resultList.push(result);
+    }),
   );
 
-  if (!result) return sendError(404, 'order not found', next);
-
-  res.status(200).json(result);
+  res.status(200).json(resultList);
 }

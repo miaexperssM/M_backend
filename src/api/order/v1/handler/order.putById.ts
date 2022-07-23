@@ -1,7 +1,10 @@
 import { Order } from 'api/order/order.entity';
+import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
+import { findZoneByGooglePosition, isInPolygon } from 'utils/calculationHelper';
 import sendError from 'utils/error';
+import { geoCodeing } from 'utils/googleService';
 
 interface OrderPutByIdParams {
   id: number;
@@ -22,7 +25,7 @@ interface OrderPutByIdBody {
   region: string;
   province: string;
   comuna: string;
-  detailAddress: string;
+  address: string;
   weight: number;
   value: number;
   description: string;
@@ -31,14 +34,36 @@ interface OrderPutByIdBody {
 }
 
 export async function orderPutByIdHandler(req: Request, res: Response, next: NextFunction) {
-  const params: OrderPutByIdParams = req.params as any;
+  try {
+    const params: OrderPutByIdParams = req.params as any;
 
-  const order = await getRepository(Order).findOne({ id: params.id });
-  if (!order) return sendError(404, 'post not found', next);
+    const order = await getRepository(Order).findOne({ id: params.id });
+    if (!order) return sendError(404, 'post not found', next);
 
-  const body: OrderPutByIdBody = req.body;
-  const newOrder = { ...body, id: order.id };
-  await getRepository(Order).save(newOrder);
+    const body: OrderPutByIdBody = req.body;
 
-  res.status(200).json({ id: order.id });
+
+    const address = `${body.address}, ${body.comuna}, ${body.province}, ${body.region}, ${body.destinationCountry}`;
+    const orderLoactionArray = await geoCodeing(address);
+  
+    let zoneId = -1;
+    let placeId = '';
+    if (orderLoactionArray.length !== 0) {
+      const orderLoactionJson = orderLoactionArray[0];
+      const zone = await findZoneByGooglePosition(orderLoactionJson)
+      if (zone) {
+        zoneId = zone.id;
+      }
+      placeId = orderLoactionJson.place_id;
+    } else {
+      console.log("haven't found location by Google");
+    }
+
+    const newOrder = { ...body, id: order.id, zoneId, placeIdInGoogle: placeId };
+    await getRepository(Order).save(newOrder);
+
+    res.status(200).json({ id: order.id });
+  } catch (err) {
+    console.log('putById Error', err);
+  }
 }

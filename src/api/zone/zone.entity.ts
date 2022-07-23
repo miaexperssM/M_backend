@@ -1,6 +1,7 @@
 import { Account } from '../account/account.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { CommonEntity } from '../../utils/entity';
+import { Order } from 'api/order/order.entity';
 
 
 @Entity('zone')
@@ -29,4 +30,5 @@ export class Zone extends CommonEntity {
     { nullable: false },
   )
   public account: Account;
+
 }

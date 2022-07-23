@@ -6,7 +6,7 @@ export const orderGetAllValidator = celebrate({
     limit: Joi.number()
       .integer()
       .min(1)
-      .max(100000),
+      .max(1000),
     offset: Joi.number()
       .integer()
       .min(0)
@@ -31,7 +31,8 @@ export const orderGetByTrackingNumberValidator = celebrate({
 
 export const orderGetByUpdatedAtValidator = celebrate({
   params: {
-    updatedAt: Joi.string().required(),
+    from: Joi.string().required(),
+    to: Joi.string().required(),
   },
 });
 
@@ -94,6 +95,66 @@ export const orderPostValidator = celebrate({
       .allow(''),
   },
 });
+
+export const orderPostListValidator = celebrate({
+  body: [{
+    MAWB: Joi.string()
+      .max(50)
+      .default('')
+      .allow(''),
+    containerNumber: Joi.string()
+      .default('')
+      .allow(''),
+    trackingNumber: Joi.string().required(),
+    shipper: Joi.string()
+      .default('')
+      .allow(''),
+    shipperPhoneNumber: Joi.string()
+      .default('')
+      .allow(''),
+    shipperAddress: Joi.string()
+      .default('')
+      .allow(''),
+    destinationCountry: Joi.string().required(),
+    recipient: Joi.string().required(),
+    RUT: Joi.string()
+      .default('')
+      .allow(''),
+    recipientPhoneNumber: Joi.string().required(),
+    recipientEmail: Joi.string()
+      .email()
+      .default('')
+      .allow(''),
+    region: Joi.string()
+      .default('')
+      .allow('')
+      .required(),
+    province: Joi.string()
+      .default('')
+      .allow('')
+      .required(),
+    comuna: Joi.string()
+      .default('')
+      .allow('')
+      .required(),
+    address: Joi.string().required(),
+    weight: Joi.number()
+      .positive()
+      .allow(0)
+      .default(0),
+    value: Joi.number()
+      .positive()
+      .allow(0)
+      .default(0),
+    quantity: Joi.number()
+      .positive()
+      .allow(0)
+      .default(0),
+    description: Joi.string()
+      .default('')
+      .allow(''),
+  }]
+})
 
 export const orderPutByIdValidator = celebrate({
   params: {

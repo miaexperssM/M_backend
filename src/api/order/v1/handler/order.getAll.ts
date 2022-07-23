@@ -1,6 +1,9 @@
 import { Order } from 'api/order/order.entity';
+import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
+import { findZoneByGooglePosition } from 'utils/calculationHelper';
+import { geoCodeing } from 'utils/googleService';
 
 interface OrderGetAllQuery {
   offset: number;
@@ -17,9 +20,50 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
     .orderBy('id', 'DESC')
     .skip(query.offset)
     .take(query.limit)
+    .where('isDeleted = :isDeleted', { isDeleted: false })
     .getMany();
 
-  const notDeletedList = orderList.filter(order => !order.isDeleted);
+  const resultList: any[] = [];
 
-  res.status(200).json(notDeletedList);
+  await Promise.all(
+    orderList.map(async order => {
+      if (order.zoneId && order.zoneId !== 0) {
+        const zone = await getRepository(Zone).findOne({ id: order.zoneId, isDeleted: false });
+        resultList.push({ ...order, zone: zone || undefined });
+      } else {
+        const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
+        const orderLoactionArray = await geoCodeing(address);
+        if (orderLoactionArray.length !== 0) {
+          const orderLoactionJson = orderLoactionArray[0];
+          const zone = await findZoneByGooglePosition(orderLoactionJson);
+          if (zone) {
+            const newOrder = {
+              ...order,
+              zoneId: zone.id,
+              placeIdInGoogle: orderLoactionArray.place_id,
+            };
+            console.log('got', newOrder);
+            await getRepository(Order).save(newOrder);
+            resultList.push({ ...order, zone, placeId: orderLoactionJson.place_id });
+          } else {
+            const newOrder = {
+              ...order,
+              zoneId: -1,
+              placeIdInGoogle: orderLoactionArray.place_id,
+            };
+            console.log('no got', newOrder);
+            await getRepository(Order).save(newOrder);
+            resultList.push({ ...order, zone: undefined, placeId: orderLoactionJson.place_id });
+          }
+        } else {
+          console.log("haven't found location by Google");
+          resultList.push({ ...order, zone: undefined, placeId: '' });
+        }
+      }
+    }),
+  );
+
+  console.log('result -->> ', resultList);
+
+  res.status(200).json(resultList);
 }

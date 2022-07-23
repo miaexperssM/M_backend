@@ -128,4 +128,7 @@ src
 ```
 
 Other directories contain app configuration, db migration, typescript declaration and utility files. **`Config`** is a directory of files to set up before listening to the express app, but **`utils`** directory contains utilities used in various places. And **`types`** directory contains the declares used by most collections.
+
+## Version: 2.0.0 -- Date: 23 July, 2022
+
 # M_backend

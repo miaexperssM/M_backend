@@ -1,7 +1,10 @@
 import { Order } from 'api/order/order.entity';
+import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
+import { findZoneByGooglePosition, isInPolygon } from 'utils/calculationHelper';
 import sendError from 'utils/error';
+import { geoCodeing } from 'utils/googleService';
 
 interface OrderPostBody {
   MAWB: string;
@@ -18,7 +21,7 @@ interface OrderPostBody {
   region: string;
   province: string;
   comuna: string;
-  detailAddress: string;
+  address: string;
   weight: number;
   value: number;
   description: string;
@@ -33,8 +36,62 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber, isDeleted: false });
   if (alreadyTrackingNumber) return sendError(400, 'TrackingNumber already in use', next);
 
-  const newOrder = getRepository(Order).create({ ...body, createdBy: req.user.id });
+  const address = `${body.address}, ${body.comuna}, ${body.province}, ${body.region}, ${body.destinationCountry}`;
+  const orderLoactionArray = await geoCodeing(address);
+
+  let zoneId = -1;
+  let placeId = '';
+  if (orderLoactionArray.length !== 0) {
+    const orderLoactionJson = orderLoactionArray[0];
+    const zone = await findZoneByGooglePosition(orderLoactionJson);
+    if (zone) {
+      zoneId = zone.id;
+    }
+    placeId = orderLoactionJson.place_id;
+  } else {
+    console.log("haven't found location by Google");
+  }
+
+  const newOrder = getRepository(Order).create({ ...body, createdBy: req.user.id, placeIdInGoogle: placeId, zoneId });
   const order = await getRepository(Order).save(newOrder);
 
   res.status(201).json({ id: order.id });
+}
+
+export async function orderPostListHandler(req: Request, res: Response, next: NextFunction) {
+  const bodyList: OrderPostBody[] = req.body;
+  const successIdList = [];
+  const errorTrackingNumberList = [];
+  bodyList.map(async body => {
+    const trackingNumber = body.trackingNumber;
+
+    const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber, isDeleted: false });
+    if (alreadyTrackingNumber) {
+      errorTrackingNumberList.push({ trackingNumber: body.trackingNumber, reason: 'TrackingNumber already in use' });
+      return;
+    }
+
+    const address = `${body.address}, ${body.comuna}, ${body.province}, ${body.region}, ${body.destinationCountry}`;
+    const orderLoactionArray = await geoCodeing(address);
+
+    let zoneId = -1;
+    let placeId = '';
+    let queryedCount = 0
+    if (orderLoactionArray.length !== 0) {
+      const orderLoactionJson = orderLoactionArray[0];
+      const zone = await findZoneByGooglePosition(orderLoactionJson);
+      if (zone) {
+        zoneId = zone.id;
+      }
+      placeId = orderLoactionJson.place_id;
+    } else {
+      console.log("haven't found location by Google");
+    }
+
+    const newOrder = getRepository(Order).create({ ...body, createdBy: req.user.id, placeIdInGoogle: placeId, zoneId, queryedCount });
+    const order = await getRepository(Order).save(newOrder);
+    successIdList.push(order.id);
+  });
+
+  res.status(201).json({ successIdList, errorTrackingNumberList });
 }

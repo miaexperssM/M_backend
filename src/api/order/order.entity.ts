@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { CommonEntity } from '../../utils/entity';
 
 @Entity('order')
@@ -48,16 +48,16 @@ export class Order extends CommonEntity {
   @Column()
   public address: string;
 
-  @Column('float',{ nullable: true })
+  @Column('float', { nullable: true })
   public weight: number;
 
-  @Column('float',{ nullable: true })
+  @Column('float', { nullable: true })
   public value: number;
 
   @Column({ nullable: true })
   public description: string;
 
-  @Column('float',{ nullable: true })
+  @Column('float', { nullable: true })
   public quantity: number;
 
   @Column('boolean', { default: 0 })
@@ -65,4 +65,13 @@ export class Order extends CommonEntity {
 
   @Column()
   public createdBy: number;
+
+  @Column('int', { default: 0 })
+  public zoneId: number;
+
+  @Column()
+  public placeIdInGoogle: string;
+
+  @Column('int', { default: 0 })
+  public queryedCount: number;
 }
