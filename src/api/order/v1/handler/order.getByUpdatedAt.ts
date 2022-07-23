@@ -48,7 +48,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
             const newOrder = {
               ...order,
               zoneId: zone.id,
-              placeIdInGoogle: orderLoactionArray.place_id,
+              placeIdInGoogle: orderLoactionJson.place_id,
             };
             console.log('got', newOrder);
             await getRepository(Order).save(newOrder);
@@ -57,7 +57,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
             const newOrder = {
               ...order,
               zoneId: -1,
-              placeIdInGoogle: orderLoactionArray.place_id,
+              placeIdInGoogle: orderLoactionJson.place_id,
             };
             console.log('no got', newOrder);
             await getRepository(Order).save(newOrder);
@@ -65,7 +65,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
           }
         } else {
           console.log("haven't found location by Google");
-          result = { ...order, zone: undefined, placeId: -1 };
+          result = { ...order, zone: undefined, placeId: "" };
         }
       }
       resultList.push(result);

@@ -46,7 +46,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
             const newOrder = {
               ...order,
               zoneId: zone.id,
-              placeIdInGoogle: orderLoactionArray.place_id,
+              placeIdInGoogle: orderLoactionJson.place_id,
             };
             console.log('got', newOrder);
             await getRepository(Order).save(newOrder);
@@ -55,7 +55,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
             const newOrder = {
               ...order,
               zoneId: -1,
-              placeIdInGoogle: orderLoactionArray.place_id,
+              placeIdInGoogle: orderLoactionJson.place_id,
             };
             console.log('no got', newOrder);
             await getRepository(Order).save(newOrder);

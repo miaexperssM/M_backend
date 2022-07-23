@@ -60,7 +60,7 @@ export async function findZoneByGooglePosition(positionJsonByGoogle: any) {
       const points = zone.points;
       const isIn = isInPolygon(latlng, points);
       if (isIn === true) {
-        console.log('find zone: ', zone);
+        console.log('find zone: ', zone.id);
       }
       return isIn;
     });
