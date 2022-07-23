@@ -73,5 +73,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
     }),
   );
 
+  console.log("return -> ", resultList.length)
+
   res.status(200).json(resultList);
 }
