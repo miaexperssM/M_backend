@@ -39,8 +39,6 @@ export async function orderGetByTrackingNumberHandler(req: Request, res: Respons
           placeIdInGoogle: orderLoactionArray.place_id,
           queryedCount: addQueryCount,
         };
-        console.log('got', newOrder);
-
         await getRepository(Order).save(newOrder);
       } else {
         result = { ...order, zone: undefined, placeId: orderLoactionJson.place_id };
@@ -50,8 +48,6 @@ export async function orderGetByTrackingNumberHandler(req: Request, res: Respons
           placeIdInGoogle: orderLoactionArray.place_id,
           queryedCount: addQueryCount,
         };
-        console.log('no got', newOrder);
-
         await getRepository(Order).save(newOrder);
       }
     } else {

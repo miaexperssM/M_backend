@@ -31,8 +31,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
 
   await Promise.all(
     orderList.map(async order => {
-      console.log("order --- >>> ", order.id)
-
+      console.log("search order --- >>> ", order.id)
       if (order.zoneId && order.zoneId !== 0) {
         const zone = await getRepository(Zone).findOne({ id: order.zoneId, isDeleted: false });
         resultList.push({ ...order, zone: zone || undefined });
@@ -48,7 +47,6 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
               zoneId: zone.id,
               placeIdInGoogle: orderLoactionJson.place_id,
             };
-            console.log('got', newOrder);
             await getRepository(Order).save(newOrder);
             resultList.push({ ...order, zone, placeId: orderLoactionJson.place_id });
           } else {
@@ -68,8 +66,6 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
       }
     }),
   );
-
-  console.log('result -->> ', resultList);
 
   res.status(200).json(resultList);
 }

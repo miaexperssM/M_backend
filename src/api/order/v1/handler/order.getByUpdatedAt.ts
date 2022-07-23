@@ -50,7 +50,6 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
               zoneId: zone.id,
               placeIdInGoogle: orderLoactionJson.place_id,
             };
-            console.log('got', newOrder);
             await getRepository(Order).save(newOrder);
             result = { ...order, zone, placeId: orderLoactionJson.place_id };
           } else {
@@ -59,7 +58,6 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
               zoneId: -1,
               placeIdInGoogle: orderLoactionJson.place_id,
             };
-            console.log('no got', newOrder);
             await getRepository(Order).save(newOrder);
             result = { ...order, zone: undefined, placeId: orderLoactionJson.place_id };
           }
