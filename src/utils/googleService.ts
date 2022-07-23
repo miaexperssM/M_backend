@@ -7,12 +7,9 @@ export async function geoCodeing(place: string) {
   const addressInURI = encodeURIComponent(place)
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${addressInURI}&key=${apiKey}`;
 
-  console.log("url", addressInURI, url)
-
   try {
     const response = await axios.get(url);
     if (response.status === 200 && response.data.status === 'OK') {
-        console.log("result", JSON.stringify(response.data.results))
       return response.data.results;
     } else return undefined;
   } catch (err) {
