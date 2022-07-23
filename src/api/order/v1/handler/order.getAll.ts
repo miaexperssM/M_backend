@@ -13,7 +13,7 @@ interface OrderGetAllQuery {
 export async function orderGetAllHandler(req: Request, res: Response, next: NextFunction) {
   const query: OrderGetAllQuery = req.query;
 
-  const maxLength = Math.min(query.limit || 10, 10);
+  const maxLength = Math.min(query.limit || 100, 1000);
 
   const orderList = await getConnection()
     .createQueryBuilder()
