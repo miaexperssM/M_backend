@@ -13,7 +13,7 @@ interface OrderGetAllQuery {
 export async function orderGetAllHandler(req: Request, res: Response, next: NextFunction) {
   const query: OrderGetAllQuery = req.query;
 
-  const maxLength = Math.min(query.limit || 100, 100)
+  const maxLength = Math.min(query.limit || 10, 10)
 
   const orderList = await getConnection()
     .createQueryBuilder()
@@ -55,7 +55,6 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
               zoneId: -1,
               placeIdInGoogle: orderLoactionJson.place_id,
             };
-            console.log('no got', newOrder);
             await getRepository(Order).save(newOrder);
             resultList.push({ ...order, zone: undefined, placeId: orderLoactionJson.place_id });
           }
