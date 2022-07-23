@@ -31,13 +31,15 @@ export function isInPolygon(checkPoint, polygonPoints) {
   }
 }
 
-export async function findZoneByGooglePosition(positionJsonByGoogle: any) {
-  const zoneList = await getConnection()
-    .createQueryBuilder()
-    .select('zone')
-    .from(Zone, 'zone')
-    .orderBy('id', 'DESC')
-    .getMany();
+export async function findZoneByGooglePosition(positionJsonByGoogle: any, zoneListData?: any[]) {
+  const zoneList =
+    zoneListData ||
+    (await getConnection()
+      .createQueryBuilder()
+      .select('zone')
+      .from(Zone, 'zone')
+      .orderBy('id', 'DESC')
+      .getMany());
 
   const lat = positionJsonByGoogle.geometry.location.lat;
   const lng = positionJsonByGoogle.geometry.location.lng;

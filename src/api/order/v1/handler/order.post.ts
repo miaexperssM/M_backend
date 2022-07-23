@@ -60,6 +60,12 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
 
 export async function orderPostListHandler(req: Request, res: Response, next: NextFunction) {
   const bodyList: OrderPostBody[] = req.body;
+  const zoneList = await getConnection()
+    .createQueryBuilder()
+    .select('zone')
+    .from(Zone, 'zone')
+    .where('isDeleted = :isDeleted', { isDeleted: false })
+    .getMany();
   const successIdList = [];
   const errorTrackingNumberList = [];
   bodyList.map(async body => {
@@ -76,10 +82,10 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
 
     let zoneId = -1;
     let placeId = '';
-    let queryedCount = 0
+    let queryedCount = 0;
     if (orderLoactionArray.length !== 0) {
       const orderLoactionJson = orderLoactionArray[0];
-      const zone = await findZoneByGooglePosition(orderLoactionJson);
+      const zone = await findZoneByGooglePosition(orderLoactionJson, zoneList);
       if (zone) {
         zoneId = zone.id;
       }
@@ -88,7 +94,13 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
       console.log("haven't found location by Google");
     }
 
-    const newOrder = getRepository(Order).create({ ...body, createdBy: req.user.id, placeIdInGoogle: placeId, zoneId, queryedCount });
+    const newOrder = getRepository(Order).create({
+      ...body,
+      createdBy: req.user.id,
+      placeIdInGoogle: placeId,
+      zoneId,
+      queryedCount,
+    });
     const order = await getRepository(Order).save(newOrder);
     successIdList.push(order.id);
   });

@@ -22,6 +22,13 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
     .orderBy('id', 'DESC')
     .getMany();
 
+  const zoneList = await getConnection()
+    .createQueryBuilder()
+    .select('zone')
+    .from(Zone, 'zone')
+    .where('isDeleted = :isDeleted', { isDeleted: false })
+    .getMany();
+
   const startDate = dayjs(params.from);
   const endDate = dayjs(params.to);
 
@@ -35,7 +42,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
     result.map(async order => {
       let result: any = order;
       if (order.zoneId && order.zoneId !== 0) {
-        const zone = await getRepository(Zone).findOne({ id: order.zoneId, isDeleted: false });
+        const zone = zoneList.find(zone => zone.id === order.zoneId);
         result = { ...order, zone: zone || undefined };
       } else {
         const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
@@ -43,7 +50,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
 
         if (orderLoactionArray.length !== 0) {
           const orderLoactionJson = orderLoactionArray[0];
-          const zone = await findZoneByGooglePosition(orderLoactionJson);
+          const zone = await findZoneByGooglePosition(orderLoactionJson, zoneList);
           if (zone) {
             const newOrder = {
               ...order,
@@ -63,7 +70,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
           }
         } else {
           console.log("haven't found location by Google");
-          result = { ...order, zone: undefined, placeId: "" };
+          result = { ...order, zone: undefined, placeId: '' };
         }
       }
       resultList.push(result);

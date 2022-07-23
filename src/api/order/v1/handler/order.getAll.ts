@@ -13,7 +13,7 @@ interface OrderGetAllQuery {
 export async function orderGetAllHandler(req: Request, res: Response, next: NextFunction) {
   const query: OrderGetAllQuery = req.query;
 
-  const maxLength = Math.min(query.limit || 10, 10)
+  const maxLength = Math.min(query.limit || 10, 10);
 
   const orderList = await getConnection()
     .createQueryBuilder()
@@ -25,22 +25,29 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
     .where('isDeleted = :isDeleted', { isDeleted: false })
     .getMany();
 
+  const zoneList = await getConnection()
+    .createQueryBuilder()
+    .select('zone')
+    .from(Zone, 'zone')
+    .where('isDeleted = :isDeleted', { isDeleted: false })
+    .getMany();
+
   const resultList: any[] = [];
 
-  console.log("orderList", orderList.length)
+  console.log('orderList', orderList.length);
 
   await Promise.all(
     orderList.map(async order => {
-      console.log("search order --- >>> ", order.id)
+      console.log('search order --- >>> ', order.id);
       if (order.zoneId && order.zoneId !== 0) {
-        const zone = await getRepository(Zone).findOne({ id: order.zoneId, isDeleted: false });
+        const zone = zoneList.find((zone)=>zone.id === order.zoneId)
         resultList.push({ ...order, zone: zone || undefined });
       } else {
         const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
         const orderLoactionArray = await geoCodeing(address);
         if (orderLoactionArray.length !== 0) {
           const orderLoactionJson = orderLoactionArray[0];
-          const zone = await findZoneByGooglePosition(orderLoactionJson);
+          const zone = await findZoneByGooglePosition(orderLoactionJson, zoneList);
           if (zone) {
             const newOrder = {
               ...order,
