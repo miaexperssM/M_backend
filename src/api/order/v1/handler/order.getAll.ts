@@ -19,7 +19,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
     .from(Order, 'order')
     .orderBy('id', 'DESC')
     .skip(query.offset)
-    .take(query.limit)
+    .take(Math.min(query.limit, 100))
     .where('isDeleted = :isDeleted', { isDeleted: false })
     .getMany();
 
