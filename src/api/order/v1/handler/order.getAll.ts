@@ -27,8 +27,12 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
 
   const resultList: any[] = [];
 
+  console.log("orderList", orderList.length)
+
   await Promise.all(
     orderList.map(async order => {
+      console.log("order --- >>> ", order.id)
+
       if (order.zoneId && order.zoneId !== 0) {
         const zone = await getRepository(Zone).findOne({ id: order.zoneId, isDeleted: false });
         resultList.push({ ...order, zone: zone || undefined });
