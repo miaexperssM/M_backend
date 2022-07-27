@@ -69,7 +69,7 @@ export class Order extends CommonEntity {
   @Column('int', { default: 0 })
   public zoneId: number;
 
-  @Column()
+  @Column({length: '300'})
   public placeIdInGoogle: string;
 
   @Column('int', { default: 0 })
