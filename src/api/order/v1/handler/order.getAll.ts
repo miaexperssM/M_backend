@@ -12,6 +12,8 @@ interface OrderGetAllQuery {
 
 export async function orderGetAllHandler(req: Request, res: Response, next: NextFunction) {
   const query: OrderGetAllQuery = req.query;
+  
+  const offset = query.offset || 0
 
   const maxLength = Math.min(query.limit || 100, 5000);
 
@@ -20,7 +22,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
     .select('order')
     .from(Order, 'order')
     .orderBy('id', 'DESC')
-    .skip(query.offset)
+    .skip(offset)
     .take(maxLength)
     .where('isDeleted = :isDeleted', { isDeleted: false })
     .getMany();

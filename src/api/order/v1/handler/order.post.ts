@@ -42,6 +42,7 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   let zoneId = -1;
   let placeId = '';
   if (orderLoactionArray.length !== 0) {
+
     const orderLoactionJson = orderLoactionArray[0];
     const zone = await findZoneByGooglePosition(orderLoactionJson);
     if (zone) {
@@ -55,7 +56,7 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   const newOrder = getRepository(Order).create({ ...body, createdBy: req.user.id, placeIdInGoogle: placeId, zoneId });
   const order = await getRepository(Order).save(newOrder);
 
-  res.status(201).json({ id: order.id });
+  res.status(201).json(order);
 }
 
 export async function orderPostListHandler(req: Request, res: Response, next: NextFunction) {
