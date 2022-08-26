@@ -22,7 +22,7 @@ export const DB_NAME = process.env.DB_NAME || 'test';
 export const DB_SYNC = Boolean(process.env.DB_SYNC) || false;
 
 export const JWT_SECRET = JWT_SECRET_DATA || process.env.JWT_SECRET || 'jwtsecret';
-export const JWT_EXPIRE = Number(process.env.JWT_EXPIRE) || 14 * 24 * 60 * 60;
+export const JWT_EXPIRE = Number(process.env.JWT_EXPIRE) || 60 * 24 * 60 * 60;
 
 export const FILE_SIZE = Number(process.env.FILE_SIZE) || Infinity;
 

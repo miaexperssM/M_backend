@@ -24,7 +24,7 @@ export async function orderGetByTrackingNumberHandler(req: Request, res: Respons
     const newOrder = { ...order, queryedCount: addQueryCount };
     await getRepository(Order).save(newOrder);
   } else {
-    const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
+    const address = `${order.address}, ${order.region}, ${order.destinationCountry}`
     const orderLoactionArray = await geoCodeing(address);
 
     if (orderLoactionArray.length !== 0) {

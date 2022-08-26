@@ -50,7 +50,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
           zone: zone ? { title: zone.title || undefined, description: zone.description || undefined } : undefined,
         };
       } else {
-        const address = `${order.address}, ${order.comuna}, ${order.province}, ${order.region}, ${order.destinationCountry}`;
+        const address = `${order.address}, ${order.region}, ${order.destinationCountry}`
         const orderLoactionArray = await geoCodeing(address);
 
         if (orderLoactionArray.length !== 0) {

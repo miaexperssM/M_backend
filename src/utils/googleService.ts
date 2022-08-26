@@ -4,14 +4,17 @@ import { GOOGLE_API_KEY } from 'config/environments';
 const apiKey = GOOGLE_API_KEY;
 
 export async function geoCodeing(place: string) {
-  const addressInURI = encodeURIComponent(place)
+  const addressInURI = encodeURIComponent(place);
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${addressInURI}&key=${apiKey}`;
 
   try {
     const response = await axios.get(url);
     if (response.status === 200 && response.data.status === 'OK') {
       return response.data.results;
-    } else return [];
+    } else {
+      console.log('get geoCoding by Goolge response not 200 or OK');
+      return [];
+    }
   } catch (err) {
     console.log('geoCoding Error', err);
     return undefined;
@@ -26,7 +29,7 @@ export async function findPlaceById(placeId: string) {
       return response.data.results;
     } else return undefined;
   } catch (err) {
-    console.log('geoCoding Error', err);
+    console.log('findPlaceById Error', err);
     return undefined;
   }
 }

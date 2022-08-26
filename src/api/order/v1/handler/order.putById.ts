@@ -43,7 +43,7 @@ export async function orderPutByIdHandler(req: Request, res: Response, next: Nex
     const body: OrderPutByIdBody = req.body;
 
 
-    const address = `${body.address}, ${body.comuna}, ${body.province}, ${body.region}, ${body.destinationCountry}`;
+    const address = `${body.address}, ${body.region}, ${body.destinationCountry}`;
     const orderLoactionArray = await geoCodeing(address);
   
     let zoneId = -1;

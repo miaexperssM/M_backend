@@ -131,4 +131,10 @@ Other directories contain app configuration, db migration, typescript declaratio
 
 ## Version: 2.0.0 -- Date: 23 July, 2022
 
+## Version: 2.0.1 -- Date: 27 Aug, 2022
+
+### Bug fix
+
+- Adapt to Google Map Api that updated in Aug 19, 2022
+
 # M_backend

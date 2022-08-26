@@ -36,13 +36,12 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber, isDeleted: false });
   if (alreadyTrackingNumber) return sendError(400, 'TrackingNumber already in use', next);
 
-  const address = `${body.address}, ${body.comuna}, ${body.province}, ${body.region}, ${body.destinationCountry}`;
+  const address = `${body.address}, ${body.region}, ${body.destinationCountry}`;
   const orderLoactionArray = await geoCodeing(address);
 
   let zoneId = -1;
   let placeId = '';
   if (orderLoactionArray.length !== 0) {
-
     const orderLoactionJson = orderLoactionArray[0];
     const zone = await findZoneByGooglePosition(orderLoactionJson);
     if (zone) {
@@ -78,7 +77,7 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
       return;
     }
 
-    const address = `${body.address}, ${body.comuna}, ${body.province}, ${body.region}, ${body.destinationCountry}`;
+    const address = `${body.address}, ${body.region}, ${body.destinationCountry}`;
     const orderLoactionArray = await geoCodeing(address);
 
     let zoneId = -1;
