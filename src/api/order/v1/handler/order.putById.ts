@@ -2,7 +2,7 @@ import { Order } from 'api/order/order.entity';
 import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
 import { getConnection, getRepository } from 'typeorm';
-import { findZoneByGooglePosition, isInPolygon } from 'utils/calculationHelper';
+import { findZoneByGooglePosition, getAddressStringByOrder, isInPolygon } from 'utils/calculationHelper';
 import sendError from 'utils/error';
 import { geoCodeing } from 'utils/googleService';
 
@@ -43,7 +43,7 @@ export async function orderPutByIdHandler(req: Request, res: Response, next: Nex
     const body: OrderPutByIdBody = req.body;
 
 
-    const address = `${body.address}, ${body.region}, ${body.destinationCountry}`;
+    const address = getAddressStringByOrder(body);
     const orderLoactionArray = await geoCodeing(address);
   
     let zoneId = -1;

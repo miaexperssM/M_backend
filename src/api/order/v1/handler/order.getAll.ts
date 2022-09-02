@@ -2,7 +2,7 @@ import { Order } from 'api/order/order.entity';
 import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
 import { getConnection, getRepository } from 'typeorm';
-import { findZoneByGooglePosition } from 'utils/calculationHelper';
+import { findZoneByGooglePosition, getAddressStringByOrder } from 'utils/calculationHelper';
 import { geoCodeing } from 'utils/googleService';
 
 interface OrderGetAllQuery {
@@ -12,8 +12,8 @@ interface OrderGetAllQuery {
 
 export async function orderGetAllHandler(req: Request, res: Response, next: NextFunction) {
   const query: OrderGetAllQuery = req.query;
-  
-  const offset = query.offset || 0
+
+  const offset = query.offset || 0;
 
   const maxLength = Math.min(query.limit || 100, 5000);
 
@@ -42,7 +42,7 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
         const zone = zoneList.find(zone => zone.id === order.zoneId);
         resultList.push({ ...order, zone: zone ? { title: zone.title, description: zone.description } : undefined });
       } else {
-        const address = `${order.address}, ${order.region}, ${order.destinationCountry}`;
+        const address = getAddressStringByOrder(order);
         const orderLoactionArray = await geoCodeing(address);
         if (orderLoactionArray && orderLoactionArray.length !== 0) {
           const orderLoactionJson = orderLoactionArray[0];

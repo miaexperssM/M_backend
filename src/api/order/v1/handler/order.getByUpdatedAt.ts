@@ -5,7 +5,7 @@ import { getConnection, getRepository } from 'typeorm';
 import dayjs from 'dayjs';
 import { geoCodeing } from 'utils/googleService';
 import { Zone } from 'api/zone/zone.entity';
-import { findZoneByGooglePosition } from 'utils/calculationHelper';
+import { findZoneByGooglePosition, getAddressStringByOrder } from 'utils/calculationHelper';
 
 interface OrderGetByUpdatedAtParams {
   from: string;
@@ -50,7 +50,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
           zone: zone ? { title: zone.title || undefined, description: zone.description || undefined } : undefined,
         };
       } else {
-        const address = `${order.address}, ${order.region}, ${order.destinationCountry}`
+        const address = getAddressStringByOrder(order);
         const orderLoactionArray = await geoCodeing(address);
 
         if (orderLoactionArray.length !== 0) {

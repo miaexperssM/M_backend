@@ -1,3 +1,4 @@
+import { Order } from 'api/order/order.entity';
 import { Zone } from 'api/zone/zone.entity';
 import { getConnection } from 'typeorm';
 
@@ -73,4 +74,8 @@ export async function findZoneByGooglePosition(positionJsonByGoogle: any, zoneLi
     console.log('GOT NO ZONE');
     return undefined;
   }
+}
+
+export function getAddressStringByOrder(order: any) {
+  return `${order.address || ''}, ${order.comuna || ''}, ${order.destinationCountry || ''}`;
 }
