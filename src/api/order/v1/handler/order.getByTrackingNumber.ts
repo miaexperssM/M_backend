@@ -2,7 +2,7 @@ import { Order } from 'api/order/order.entity';
 import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import { findZoneByGooglePosition, getAddressStringByOrder } from 'utils/calculationHelper';
+import { findZoneByGooglePosition, getAddressStringByOrder, getCountryCodeByOrder } from 'utils/calculationHelper';
 import sendError from 'utils/error';
 import { geoCodeing } from 'utils/googleService';
 
@@ -25,7 +25,8 @@ export async function orderGetByTrackingNumberHandler(req: Request, res: Respons
     await getRepository(Order).save(newOrder);
   } else {
     const address = getAddressStringByOrder(order);
-    const orderLoactionArray = await geoCodeing(address);
+    const countryCode = getCountryCodeByOrder(order)
+    const orderLoactionArray = await geoCodeing(address, countryCode);
 
     if (orderLoactionArray.length !== 0) {
       const orderLoactionJson = orderLoactionArray[0];

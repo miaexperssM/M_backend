@@ -3,9 +3,13 @@ import { GOOGLE_API_KEY } from 'config/environments';
 
 const apiKey = GOOGLE_API_KEY;
 
-export async function geoCodeing(place: string) {
+export async function geoCodeing(place: string, countryCode: string | undefined) {
   const addressInURI = encodeURIComponent(place);
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${addressInURI}&key=${apiKey}`;
+  let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${addressInURI}&key=${apiKey}`;
+
+  if (countryCode) {
+    url = `https://maps.googleapis.com/maps/api/geocode/json?components=country:${countryCode}&address=${addressInURI}&key=${apiKey}`;
+  }
 
   try {
     const response = await axios.get(url);

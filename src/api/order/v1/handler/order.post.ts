@@ -2,7 +2,12 @@ import { Order } from 'api/order/order.entity';
 import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
 import { getConnection, getRepository } from 'typeorm';
-import { findZoneByGooglePosition, getAddressStringByOrder, isInPolygon } from 'utils/calculationHelper';
+import {
+  findZoneByGooglePosition,
+  getAddressStringByOrder,
+  getCountryCodeByOrder,
+  isInPolygon,
+} from 'utils/calculationHelper';
 import sendError from 'utils/error';
 import { geoCodeing } from 'utils/googleService';
 
@@ -36,8 +41,10 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber, isDeleted: false });
   if (alreadyTrackingNumber) return sendError(400, 'TrackingNumber already in use', next);
 
-  const address = getAddressStringByOrder(body);;
-  const orderLoactionArray = await geoCodeing(address);
+  const address = getAddressStringByOrder(body);
+  const countryCode = getCountryCodeByOrder(body);
+
+  const orderLoactionArray = await geoCodeing(address, countryCode);
 
   let zoneId = -1;
   let placeId = '';
@@ -78,7 +85,9 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
     }
 
     const address = getAddressStringByOrder(body);
-    const orderLoactionArray = await geoCodeing(address);
+    const countryCode = getCountryCodeByOrder(body);
+
+    const orderLoactionArray = await geoCodeing(address, countryCode);
 
     let zoneId = -1;
     let placeId = '';

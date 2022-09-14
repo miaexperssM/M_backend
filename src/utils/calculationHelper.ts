@@ -77,5 +77,16 @@ export async function findZoneByGooglePosition(positionJsonByGoogle: any, zoneLi
 }
 
 export function getAddressStringByOrder(order: any) {
-  return `${order.address || ''}, ${order.comuna || ''}, ${order.destinationCountry || ''}`;
+  const region = order.region?.includes("Metropolitana") ? "Metropolitana" : ""
+  
+  return `${order.address || ''}, ${order.comuna || ''}, ${region}, ${order.destinationCountry || ''}`;
+}
+
+export function getCountryCodeByOrder(order: any) {
+  if(order.destinationCountry){
+    return order.destinationCountry.includes("Chile")? "CL": undefined
+  }
+  else{
+    return undefined
+  }
 }

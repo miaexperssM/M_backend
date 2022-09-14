@@ -2,7 +2,7 @@ import { Order } from 'api/order/order.entity';
 import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
 import { getConnection, getRepository } from 'typeorm';
-import { findZoneByGooglePosition, getAddressStringByOrder } from 'utils/calculationHelper';
+import { findZoneByGooglePosition, getAddressStringByOrder, getCountryCodeByOrder } from 'utils/calculationHelper';
 import { geoCodeing } from 'utils/googleService';
 
 interface OrderGetAllQuery {
@@ -43,7 +43,8 @@ export async function orderGetAllHandler(req: Request, res: Response, next: Next
         resultList.push({ ...order, zone: zone ? { title: zone.title, description: zone.description } : undefined });
       } else {
         const address = getAddressStringByOrder(order);
-        const orderLoactionArray = await geoCodeing(address);
+        const countryCode = getCountryCodeByOrder(order)
+        const orderLoactionArray = await geoCodeing(address,countryCode);
         if (orderLoactionArray && orderLoactionArray.length !== 0) {
           const orderLoactionJson = orderLoactionArray[0];
           const zone = await findZoneByGooglePosition(orderLoactionJson, zoneList);
