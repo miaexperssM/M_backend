@@ -5,22 +5,19 @@ const apiKey = GOOGLE_API_KEY;
 
 export async function geoCodeing(place: string, countryCode: string | undefined) {
   const addressInURI = encodeURIComponent(place);
-  let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${addressInURI}&key=${apiKey}`;
-
-  if (countryCode) {
-    url = `https://maps.googleapis.com/maps/api/geocode/json?components=country:${countryCode}&address=${addressInURI}&key=${apiKey}`;
-  }
+  const searchQuery = `fields=formatted_address%2Cplace_id%2Cgeometry&input=${addressInURI}&inputtype=textquery&key=${apiKey}`
+  let url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?${searchQuery}`
 
   try {
     const response = await axios.get(url);
     if (response.status === 200 && response.data.status === 'OK') {
-      return response.data.results;
+      return response.data.candidates;
     } else {
-      console.log('get geoCoding by Goolge response not 200 or OK');
+      console.log('find place by Goolge response not 200 or OK');
       return [];
     }
   } catch (err) {
-    console.log('geoCoding Error', err);
+    console.log('find place Error', err);
     return undefined;
   }
 }
