@@ -64,3 +64,10 @@ export const accountDelByIdValidator = celebrate({
       .required(),
   },
 });
+
+export const postSignInByAccountIdValidator = celebrate({
+  body: {
+    accountId: Joi.string().required(),
+    password: Joi.string().required(),
+  },
+});

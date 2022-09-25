@@ -3,9 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import sendError from 'utils/error';
 import { getConnection, getRepository } from 'typeorm';
 import dayjs from 'dayjs';
-import { geoCodeing } from 'utils/googleService';
 import { Zone } from 'api/zone/zone.entity';
-import { findZoneByGooglePosition, getAddressStringByOrder, getCountryCodeByOrder } from 'utils/calculationHelper';
 
 interface OrderGetByUpdatedAtParams {
   from: string;
@@ -49,47 +47,16 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
           ...order,
           zone: zone ? { title: zone.title || undefined, description: zone.description || undefined } : undefined,
         };
+        resultList.push(result);
       } else {
-        const address = getAddressStringByOrder(order);
-        const countryCode = getCountryCodeByOrder(order);
-        const orderLoactionArray = await geoCodeing(address, countryCode);
-
-        if (orderLoactionArray.length !== 0) {
-          const orderLoactionJson = orderLoactionArray[0];
-          const zone = await findZoneByGooglePosition(orderLoactionJson, zoneList);
-          if (zone) {
-            const newOrder = {
-              ...order,
-              zoneId: zone.id,
-              placeIdInGoogle: orderLoactionJson.place_id,
-            };
-            await getRepository(Order).save(newOrder);
-            result = {
-              ...order,
-              zone: { title: zone.title, description: zone.description },
-              placeId: orderLoactionJson.place_id,
-            };
-          } else {
-            const newOrder = {
-              ...order,
-              zoneId: -1,
-              placeIdInGoogle: orderLoactionJson.place_id,
-            };
-            await getRepository(Order).save(newOrder);
-            result = { ...order, zone: undefined, placeId: orderLoactionJson.place_id };
-          }
-        } else {
-          const newOrder = {
-            ...order,
-            zoneId: -1,
-            placeIdInGoogle: '',
-          };
-          await getRepository(Order).save(newOrder);
-          console.log("haven't found location by Google");
-          resultList.push({ ...order, zone: undefined, placeId: '' });
-        }
+        const newOrder = {
+          ...order,
+          zoneId: -1,
+          placeIdInGoogle: '',
+        };
+        await getRepository(Order).save(newOrder);
+        resultList.push({ ...order, zone: undefined, placeId: '' });
       }
-      resultList.push(result);
     }),
   );
 

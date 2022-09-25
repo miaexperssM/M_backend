@@ -32,7 +32,12 @@ export function isInPolygon(checkPoint, polygonPoints) {
   }
 }
 
-export async function findZoneByGooglePosition(positionJsonByGoogle: any, zoneListData?: any[]) {
+interface location{
+  lng: number;
+  lat: number;
+}
+
+export async function findZoneByPlaceLocation(location: location, zoneListData?: any[]) {
   const zoneList =
     zoneListData ||
     (await getConnection()
@@ -42,18 +47,15 @@ export async function findZoneByGooglePosition(positionJsonByGoogle: any, zoneLi
       .orderBy('id', 'DESC')
       .getMany());
 
-  const lat = positionJsonByGoogle.geometry.location.lat;
-  const lng = positionJsonByGoogle.geometry.location.lng;
-
-  const latlng = { lat, lng };
+  const latlng = location
 
   const zone = zoneList
     .filter(zone => !zone.isDeleted)
     .map(zone => {
       const pointsArray = zone.points.split('_');
       const point = pointsArray.map(point => {
-        const location = point.split(',');
-        const gps = { lat: parseFloat(location[0]), lng: parseFloat(location[1]) };
+        const pointLocation = point.split(',');
+        const gps = { lat: parseFloat(pointLocation[0]), lng: parseFloat(pointLocation[1]) };
         return gps;
       });
       const zoneData = { ...zone, points: point };

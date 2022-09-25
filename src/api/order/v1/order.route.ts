@@ -16,7 +16,9 @@ import {
   orderGetByTrackingNumberValidator,
   orderGetByUpdatedAtValidator,
   orderPostListValidator,
+  orderPostByTrackingNumberListValidator,
 } from './order.validator';
+import { orderPostByTrackingNumberListHandler } from './handler/order.postByTrackingNumberList';
 
 export const routes: CommonRoute[] = [
   {
@@ -46,6 +48,13 @@ export const routes: CommonRoute[] = [
     auth: true,
     validator: orderGetByTrackingNumberValidator,
     handler: orderGetByTrackingNumberHandler,
+  },
+  {
+    path: '/orders/trackList',
+    method: 'post',
+    auth: true,
+    validator: orderPostByTrackingNumberListValidator,
+    handler: orderPostByTrackingNumberListHandler,
   },
   {
     path: '/addOrder',

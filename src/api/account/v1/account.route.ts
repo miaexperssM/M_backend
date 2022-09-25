@@ -4,6 +4,7 @@ import {
   addNewUserValidator,
   modifyUserValidator,
   accountDelByIdValidator,
+  postSignInByAccountIdValidator,
 } from './account.validator';
 import { getTokenHandler } from './handler/account.getToken';
 import { postSignInHandler } from './handler/account.postSignIn';
@@ -12,6 +13,7 @@ import { getAllUsersHandler } from './handler/account.getAll';
 import { addNewUserHandler } from './handler/account.postNewUser';
 import { accountPutByIdHandler } from './handler/account.putById';
 import { accountDelByIdHandler } from './handler/account.delById';
+import { postSignInByAccountIdHandler } from './handler/account.postSignInByAccountId';
 
 export const routes: CommonRoute[] = [
   {
@@ -25,6 +27,12 @@ export const routes: CommonRoute[] = [
     method: 'post',
     validator: postSignInValidator,
     handler: postSignInHandler,
+  },
+  {
+    path: '/sortPick/signin',
+    method: 'post',
+    validator: postSignInByAccountIdValidator,
+    handler: postSignInByAccountIdHandler,
   },
   {
     path: '/token',
@@ -47,5 +55,5 @@ export const routes: CommonRoute[] = [
     validator: accountDelByIdValidator,
     handler: accountDelByIdHandler,
   },
-  {path: '/users', method: 'get', auth: true, handler: getAllUsersHandler },
+  { path: '/users', method: 'get', auth: true, handler: getAllUsersHandler },
 ];

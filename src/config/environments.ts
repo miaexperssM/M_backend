@@ -11,6 +11,10 @@ const JWT_SECRET_DATA = existsSync(JWT_SECRET_FILE) ? readFileSync(JWT_SECRET_FI
 
 export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
 
+export const HERE_API_KEY = process.env.HERE_API_KEY
+
+export const MAP_SERVICE = process.env.MAP_SERVICE
+
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 export const PORT = Number(process.env.PORT) || 3002;
 

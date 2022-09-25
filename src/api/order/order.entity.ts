@@ -52,6 +52,15 @@ export class Order extends CommonEntity {
   public weight: number;
 
   @Column('float', { nullable: true })
+  public length: number;
+
+  @Column('float', { nullable: true })
+  public height: number;
+
+  @Column('float', { nullable: true })
+  public width: number;
+
+  @Column('float', { nullable: true })
   public value: number;
 
   @Column({ nullable: true })
@@ -74,6 +83,12 @@ export class Order extends CommonEntity {
 
   @Column('int', { default: 0 })
   public queryedCount: number;
+
+  @Column('varchar', { length: '10000', default: '' })
+  public location: string;
+
+  @Column('int', { nullable: true })
+  public updatedBy: number;
 
   @Column({ type: 'timestamp', nullable: true })
   public expiredDate: Date;

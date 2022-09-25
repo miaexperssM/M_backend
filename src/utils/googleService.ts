@@ -3,7 +3,7 @@ import { GOOGLE_API_KEY } from 'config/environments';
 
 const apiKey = GOOGLE_API_KEY;
 
-export async function geoCodeing(place: string, countryCode: string | undefined) {
+export async function geoCodeingByGoogle(place: string, countryCode: string | undefined) {
   const addressInURI = encodeURIComponent(place);
   const searchQuery = `fields=formatted_address%2Cplace_id%2Cgeometry&input=${addressInURI}&inputtype=textquery&key=${apiKey}`
   let url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?${searchQuery}`
