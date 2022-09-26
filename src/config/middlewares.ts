@@ -9,7 +9,11 @@ import logger from 'utils/logger';
 export function mountMiddlewares(app: Express) {
   app.use(cors());
   app.use(helmet());
-  app.use(bodyParser.json());
+  app.use(
+    bodyParser.json({
+      limit: '1mb',
+    }),
+  );
 
   app.use(
     morgan('combined', {
