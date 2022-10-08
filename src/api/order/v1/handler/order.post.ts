@@ -45,46 +45,45 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   const address = getAddressStringByOrder(body);
   const countryCode = getCountryCodeByOrder(body);
 
-  //  ================     Google Service      ==================
-  // const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
-
-  // let zoneId = -1;
-  // let placeId = '';
-  // if (orderLoactionArray.length !== 0) {
-  //   const orderLoactionJson = orderLoactionArray[0];
-  //   const zone = await findZoneByPlaceLocation(orderLoactionJson.geometry.location);
-  //   if (zone) {
-  //     zoneId = zone.id;
-  //   }
-  //   placeId = orderLoactionJson.place_id;
-  // } else {
-  //   console.log("haven't found location by Google");
-  // }
-
-  //  ================     HERE Service      ==================
-
-  const placeList = await geoCodeingByHERE(address, countryCode);
   let zoneId = -1;
   let placeId = '';
   let locationStr = '';
-  if (placeList.length !== 0) {
-    const orderLoactionJson = placeList[0];
-    const lnglat = orderLoactionJson.Result[0].Location.DisplayPosition
-      ? {
-          lng: orderLoactionJson.Result[0].Location.DisplayPosition.Longitude,
-          lat: orderLoactionJson.Result[0].Location.DisplayPosition.Latitude,
-        }
-      : undefined;
-    if (lnglat) {
-      const zone = await findZoneByPlaceLocation(lnglat);
-      if (zone) {
-        zoneId = zone.id;
-      }
-      locationStr = JSON.stringify(orderLoactionJson.Result[0]);
+
+  //  ================     Google Service      ==================
+  const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
+  if (orderLoactionArray.length !== 0) {
+    const orderLoactionJson = orderLoactionArray[0];
+    const zone = await findZoneByPlaceLocation(orderLoactionJson.geometry.location);
+    if (zone) {
+      zoneId = zone.id;
     }
+    placeId = orderLoactionJson.place_id;
+    locationStr = JSON.stringify(orderLoactionJson)
   } else {
-    console.log("haven't found location by Here");
+    console.log("haven't found location by Google");
   }
+
+  //  ================     HERE Service      ==================
+
+  // const placeList = await geoCodeingByHERE(address, countryCode);
+  // if (placeList.length !== 0) {
+  //   const orderLoactionJson = placeList[0];
+  //   const lnglat = orderLoactionJson.Result[0].Location.DisplayPosition
+  //     ? {
+  //         lng: orderLoactionJson.Result[0].Location.DisplayPosition.Longitude,
+  //         lat: orderLoactionJson.Result[0].Location.DisplayPosition.Latitude,
+  //       }
+  //     : undefined;
+  //   if (lnglat) {
+  //     const zone = await findZoneByPlaceLocation(lnglat);
+  //     if (zone) {
+  //       zoneId = zone.id;
+  //     }
+  //     locationStr = JSON.stringify(orderLoactionJson.Result[0]);
+  //   }
+  // } else {
+  //   console.log("haven't found location by Here");
+  // }
 
   const newOrder = getRepository(Order).create({
     ...body,
@@ -121,48 +120,46 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
     const address = getAddressStringByOrder(body);
     const countryCode = getCountryCodeByOrder(body);
 
-    //  ================     Google Service      ==================
-
-    // const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
-
-    // let zoneId = -1;
-    // let placeId = '';
-    // let queryedCount = 0;
-    // if (orderLoactionArray.length !== 0) {
-    //   const orderLoactionJson = orderLoactionArray[0];
-    //   const zone = await findZoneByPlaceLocation(orderLoactionJson.geometry.location, zoneList);
-    //   if (zone) {
-    //     zoneId = zone.id;
-    //   }
-    //   placeId = orderLoactionJson.place_id;
-    // } else {
-    //   console.log("haven't found location by Google");
-    // }
-
-    //  ================     HERE Service      ==================
-
-    const placeList = await geoCodeingByHERE(address, countryCode);
     let zoneId = -1;
     let placeId = '';
     let locationStr = '';
-    if (placeList.length !== 0) {
-      const orderLoactionJson = placeList[0];
-      const lnglat = orderLoactionJson.Result[0].Location.DisplayPosition
-        ? {
-            lng: orderLoactionJson.Result[0].Location.DisplayPosition.Longitude,
-            lat: orderLoactionJson.Result[0].Location.DisplayPosition.Latitude,
-          }
-        : undefined;
-      if (lnglat) {
-        const zone = await findZoneByPlaceLocation(lnglat);
-        if (zone) {
-          zoneId = zone.id;
-        }
-        locationStr = JSON.stringify(orderLoactionJson.Result[0]);
+
+    //  ================     Google Service      ==================
+
+    const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
+    if (orderLoactionArray.length !== 0) {
+      const orderLoactionJson = orderLoactionArray[0];
+      const zone = await findZoneByPlaceLocation(orderLoactionJson.geometry.location, zoneList);
+      if (zone) {
+        zoneId = zone.id;
       }
+      placeId = orderLoactionJson.place_id;
+      locationStr = JSON.stringify(orderLoactionJson)
     } else {
-      console.log("haven't found location by Here");
+      console.log("haven't found location by Google");
     }
+
+    //  ================     HERE Service      ==================
+
+    // const placeList = await geoCodeingByHERE(address, countryCode);
+    // if (placeList.length !== 0) {
+    //   const orderLoactionJson = placeList[0];
+    //   const lnglat = orderLoactionJson.Result[0].Location.DisplayPosition
+    //     ? {
+    //         lng: orderLoactionJson.Result[0].Location.DisplayPosition.Longitude,
+    //         lat: orderLoactionJson.Result[0].Location.DisplayPosition.Latitude,
+    //       }
+    //     : undefined;
+    //   if (lnglat) {
+    //     const zone = await findZoneByPlaceLocation(lnglat);
+    //     if (zone) {
+    //       zoneId = zone.id;
+    //     }
+    //     locationStr = JSON.stringify(orderLoactionJson.Result[0]);
+    //   }
+    // } else {
+    //   console.log("haven't found location by Here");
+    // }
 
     const newOrder = getRepository(Order).create({
       ...body,

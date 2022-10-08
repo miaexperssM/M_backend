@@ -43,7 +43,7 @@ const sampleViewJson = {
 export async function geoCodeingByHERE(place: string, countryCode: string | undefined) {
   const addressInURI = encodeURIComponent(place);
   const searchQuery_v7 = `q=${addressInURI}&apiKey=${apiKey}`;
-  let url_v7 = `https://geocode.search.hereapi.com/v1/geocode??${searchQuery_v7}`;
+  let url_v7 = `https://geocode.search.hereapi.com/v1/geocode?${searchQuery_v7}`;
 
   const searchQuery_v6 = `languages=en-US&maxresults=1&searchtext=${addressInURI}&apiKey=${apiKey}`;
   let url_v6 = `https://geocoder.ls.hereapi.com/search/6.2/geocode.json?${searchQuery_v6}`;
