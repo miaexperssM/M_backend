@@ -13,6 +13,8 @@ export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
 
 export const HERE_API_KEY = process.env.HERE_API_KEY
 
+export const ARCGIS_API_KEY = process.env.ARCGIS_API_KEY
+
 export const MAP_SERVICE = process.env.MAP_SERVICE
 
 export const NODE_ENV = process.env.NODE_ENV || 'development';

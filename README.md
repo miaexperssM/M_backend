@@ -137,4 +137,10 @@ Other directories contain app configuration, db migration, typescript declaratio
 
 - Adapt to Google Map Api that updated in Aug 19, 2022
 
+## Version: 2.1.0 -- Date: 08 Nov, 2022
+
+### Improvement
+
+- Add ArcGIS map service as the location searching service
+
 # M_backend

@@ -9,8 +9,9 @@ import {
   isInPolygon,
 } from 'utils/calculationHelper';
 import sendError from 'utils/error';
-import { geoCodeingByGoogle } from 'utils/googleService';
-import { geoCodeingByHERE } from 'utils/hereService';
+import { searchAddressByARCGIS } from 'utils/mapServices/ArcGisService';
+import { geoCodeingByGoogle } from 'utils/mapServices/googleService';
+import { geoCodeingByHERE } from 'utils/mapServices/hereService';
 
 interface OrderPostBody {
   MAWB: string;
@@ -50,17 +51,39 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   let locationStr = '';
 
   //  ================     Google Service      ==================
-  const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
+  // const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
+  // if (orderLoactionArray.length !== 0) {
+  //   const orderLoactionJson = orderLoactionArray[0];
+  //   const zone = await findZoneByPlaceLocation(orderLoactionJson.geometry.location);
+  //   if (zone) {
+  //     zoneId = zone.id;
+  //   }
+  //   placeId = orderLoactionJson.place_id;
+  //   locationStr = JSON.stringify(orderLoactionJson);
+  // } else {
+  //   console.log("haven't found location by Google");
+  // }
+
+  //  ================     ARCGIS Service      ==================
+
+  const orderLoactionArray = await searchAddressByARCGIS(address, countryCode);
   if (orderLoactionArray.length !== 0) {
     const orderLoactionJson = orderLoactionArray[0];
-    const zone = await findZoneByPlaceLocation(orderLoactionJson.geometry.location);
-    if (zone) {
-      zoneId = zone.id;
+    const lnglat = orderLoactionJson.Location.DisplayPosition
+      ? {
+          lng: orderLoactionJson.Location.DisplayPosition.Longitude,
+          lat: orderLoactionJson.Location.DisplayPosition.Latitude,
+        }
+      : undefined;
+    if (lnglat) {
+      const zone = await findZoneByPlaceLocation(lnglat);
+      if (zone) {
+        zoneId = zone.id;
+      }
+      locationStr = JSON.stringify(orderLoactionJson);
     }
-    placeId = orderLoactionJson.place_id;
-    locationStr = JSON.stringify(orderLoactionJson)
   } else {
-    console.log("haven't found location by Google");
+    console.log("haven't found location by ArcGIS");
   }
 
   //  ================     HERE Service      ==================
@@ -126,17 +149,39 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
 
     //  ================     Google Service      ==================
 
-    const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
+    // const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
+    // if (orderLoactionArray.length !== 0) {
+    //   const orderLoactionJson = orderLoactionArray[0];
+    //   const zone = await findZoneByPlaceLocation(orderLoactionJson.geometry.location, zoneList);
+    //   if (zone) {
+    //     zoneId = zone.id;
+    //   }
+    //   placeId = orderLoactionJson.place_id;
+    //   locationStr = JSON.stringify(orderLoactionJson)
+    // } else {
+    //   console.log("haven't found location by Google");
+    // }
+
+    //  ================     ARCGIS Service      ==================
+
+    const orderLoactionArray = await searchAddressByARCGIS(address, countryCode);
     if (orderLoactionArray.length !== 0) {
       const orderLoactionJson = orderLoactionArray[0];
-      const zone = await findZoneByPlaceLocation(orderLoactionJson.geometry.location, zoneList);
-      if (zone) {
-        zoneId = zone.id;
+      const lnglat = orderLoactionJson.Location.DisplayPosition
+        ? {
+            lng: orderLoactionJson.Location.DisplayPosition.Longitude,
+            lat: orderLoactionJson.Location.DisplayPosition.Latitude,
+          }
+        : undefined;
+      if (lnglat) {
+        const zone = await findZoneByPlaceLocation(lnglat, zoneList);
+        if (zone) {
+          zoneId = zone.id;
+        }
+        locationStr = JSON.stringify(orderLoactionJson);
       }
-      placeId = orderLoactionJson.place_id;
-      locationStr = JSON.stringify(orderLoactionJson)
     } else {
-      console.log("haven't found location by Google");
+      console.log("haven't found location by ArcGIS");
     }
 
     //  ================     HERE Service      ==================
