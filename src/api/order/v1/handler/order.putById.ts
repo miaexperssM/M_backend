@@ -49,7 +49,6 @@ export async function orderPutByIdHandler(req: Request, res: Response, next: Nex
     const body: OrderPutByIdBody = req.body;
 
     const address = getAddressStringByOrder(body);
-    const countryCode = getCountryCodeByOrder(body);
 
     let zoneId = -1;
     let placeId = '';
@@ -72,10 +71,10 @@ export async function orderPutByIdHandler(req: Request, res: Response, next: Nex
 
     //  ================     ARCGIS Service      ==================
 
-    const orderLoactionArray = await searchAddressByARCGIS(address, countryCode);
+    const orderLoactionArray = await searchAddressByARCGIS(address);
     if (orderLoactionArray.length !== 0) {
       const orderLoactionJson = orderLoactionArray[0];
-      const lnglat = orderLoactionJson.Location.DisplayPosition
+      const lnglat = orderLoactionJson?.Location?.DisplayPosition
         ? {
             lng: orderLoactionJson.Location.DisplayPosition.Longitude,
             lat: orderLoactionJson.Location.DisplayPosition.Latitude,

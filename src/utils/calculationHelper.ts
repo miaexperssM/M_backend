@@ -70,10 +70,8 @@ export async function findZoneByPlaceLocation(location: location, zoneListData?:
       return isIn;
     });
   if (zone) {
-    console.log('GOT A ZONE');
     return zone;
   } else {
-    console.log('GOT NO ZONE');
     return undefined;
   }
 }

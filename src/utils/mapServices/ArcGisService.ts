@@ -57,11 +57,9 @@ const sampleReturnJson = {
   ],
 };
 
-export async function searchAddressByARCGIS(place: string, countryCode: string | undefined) {
+export async function searchAddressByARCGIS(place: string) {
   const addressInURI = encodeURIComponent(place);
-  const searchQuery = `singleLine=${addressInURI}&f=json&${
-    countryCode !== undefined ? `countryCode=${countryCode}` : ``
-  }&token=${apiKey}`;
+  const searchQuery = `singleLine=${addressInURI}&f=json&token=${apiKey}`;
   let url = `https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?${searchQuery}`;
 
   try {
@@ -79,6 +77,7 @@ export async function searchAddressByARCGIS(place: string, countryCode: string |
             score: candidate.score || 0,
           };
         });
+
       return json;
     } else {
       console.log('placeSearch by ARCGIS response not 200');

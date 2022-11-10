@@ -7,8 +7,6 @@ export async function getLevel1ResultAction(trackingNumber: string) {
   const orderResult = await getRepository(Order).findOne({ trackingNumber, isDeleted: false });
 
   if (orderResult !== undefined) {
-    console.log("start")
-
     if (orderResult.comuna == undefined || orderResult.comuna == '') {
       const body = { port: 12, order: orderResult, reason: `Comuna information not correct` }
       return await Promise.resolve(body);
@@ -32,7 +30,6 @@ export async function getLevel1ResultAction(trackingNumber: string) {
       });
     } else {
       const body = { port: filterByComunaList[0].port, order: orderResult, reason: `OK` }
-      console.log("body", body)
       return await Promise.resolve(body);
     }
   } else {

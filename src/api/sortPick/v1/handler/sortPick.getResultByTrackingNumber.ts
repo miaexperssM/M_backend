@@ -28,7 +28,6 @@ export async function getLevel1ResultByTrackingNumberHandler(req: Request, res: 
   const params: GetResultByTrackingNumberParams = req.params as any;
 
   const result = await getLevel1ResultAction(params.trackingNumber);
-  console.log(JSON.stringify(result))
   if (result.order == undefined) {
     const json: resultJson = {
       status: status.Fail,
