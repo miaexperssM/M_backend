@@ -9,8 +9,6 @@ import {
 } from 'utils/calculationHelper';
 import sendError from 'utils/error';
 import { searchAddressByARCGIS } from 'utils/mapServices/ArcGisService';
-import { geoCodeingByGoogle } from 'utils/mapServices/googleService';
-import { geoCodeingByHERE } from 'utils/mapServices/hereService';
 
 interface OrderPutByIdParams {
   id: number;

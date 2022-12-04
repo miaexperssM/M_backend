@@ -2,16 +2,9 @@ import { Order } from 'api/order/order.entity';
 import { Zone } from 'api/zone/zone.entity';
 import { NextFunction, Request, Response } from 'express';
 import { getConnection, getRepository } from 'typeorm';
-import {
-  findZoneByPlaceLocation,
-  getAddressStringByOrder,
-  getCountryCodeByOrder,
-  isInPolygon,
-} from 'utils/calculationHelper';
+import { findZoneByPlaceLocation, getAddressStringByOrder } from 'utils/calculationHelper';
 import sendError from 'utils/error';
 import { searchAddressByARCGIS } from 'utils/mapServices/ArcGisService';
-import { geoCodeingByGoogle } from 'utils/mapServices/googleService';
-import { geoCodeingByHERE } from 'utils/mapServices/hereService';
 
 interface OrderPostBody {
   MAWB: string;
@@ -40,7 +33,7 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   const body: OrderPostBody = req.body;
   const trackingNumber = body.trackingNumber;
 
-  const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber, isDeleted: false });
+  const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber });
   if (alreadyTrackingNumber) return sendError(400, 'TrackingNumber already in use', next);
 
   const address = getAddressStringByOrder(body);
@@ -133,7 +126,7 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
   bodyList.map(async body => {
     const trackingNumber = body.trackingNumber;
 
-    const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber, isDeleted: false });
+    const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber });
     if (alreadyTrackingNumber) {
       errorTrackingNumberList.push({ trackingNumber: body.trackingNumber, reason: 'TrackingNumber already in use' });
       return;

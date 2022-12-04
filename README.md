@@ -143,4 +143,11 @@ Other directories contain app configuration, db migration, typescript declaratio
 
 - Add ArcGIS map service as the location searching service
 
+## Version: 2.3.0 -- Date: 04 Dec, 2022
+
+### Improvement
+
+- Add order error handling
+- Search orders error handling
+
 # M_backend
