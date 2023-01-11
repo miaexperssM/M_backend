@@ -32,7 +32,7 @@ export function isInPolygon(checkPoint, polygonPoints) {
   }
 }
 
-interface location{
+interface location {
   lng: number;
   lat: number;
 }
@@ -47,7 +47,7 @@ export async function findZoneByPlaceLocation(location: location, zoneListData?:
       .orderBy('id', 'DESC')
       .getMany());
 
-  const latlng = location
+  const latlng = location;
 
   const zone = zoneList
     .filter(zone => !zone.isDeleted)
@@ -84,6 +84,14 @@ export function getAddressStringByOrder(order: any) {
 export function getCountryCodeByOrder(order: any) {
   if (order.destinationCountry) {
     return order.destinationCountry.includes('Chile') ? 'CL' : undefined;
+  } else {
+    return undefined;
+  }
+}
+
+export function getCountryCodeByString(str: any) {
+  if (str) {
+    return str.includes('Chile') || str.includes('chile') ? 'CL' : undefined;
   } else {
     return undefined;
   }

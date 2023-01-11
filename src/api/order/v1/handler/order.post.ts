@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import { getConnection, getRepository } from 'typeorm';
 import { findZoneByPlaceLocation, getAddressStringByOrder } from 'utils/calculationHelper';
 import sendError from 'utils/error';
-import { searchAddressByARCGIS } from 'utils/mapServices/ArcGisService';
+import { searchAddressByARCGIS, autoSuggest } from 'utils/mapServices/ArcGisService';
 
 interface OrderPostBody {
   MAWB: string;
@@ -36,7 +36,8 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   const alreadyTrackingNumber = await getRepository(Order).findOne({ trackingNumber });
   if (alreadyTrackingNumber) return sendError(400, 'TrackingNumber already in use', next);
 
-  const address = getAddressStringByOrder(body);
+  const suggestAddress = await autoSuggest(body.address, body.comuna, body.province, body.destinationCountry);
+  const address = suggestAddress == undefined ? getAddressStringByOrder(body) : suggestAddress;
 
   let zoneId = -1;
   let placeId = '';
@@ -132,7 +133,8 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
       return;
     }
 
-    const address = getAddressStringByOrder(body);
+    const suggestAddress = await autoSuggest(body.address, body.comuna, body.province, body.destinationCountry);
+    const address = suggestAddress == undefined ? getAddressStringByOrder(body) : suggestAddress;
 
     let zoneId = -1;
     let placeId = '';

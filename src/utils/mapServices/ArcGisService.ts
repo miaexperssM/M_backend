@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ARCGIS_API_KEY } from 'config/environments';
+import { getCountryCodeByString } from 'utils/calculationHelper';
 
 const apiKey = ARCGIS_API_KEY;
 
@@ -56,6 +57,50 @@ const sampleReturnJson = {
     },
   ],
 };
+
+export async function autoSuggest(address: string, comuna: string, province: string, country: string) {
+  const addressWordList = address.split(/\s+/).map(word => encodeURIComponent(word));
+  const comunaURI = encodeURIComponent(comuna);
+  const provinceURI = encodeURIComponent(province);
+  const countryURI = getCountryCodeByString(country);
+
+  const getSuggest = async (addressList, initMaxWordCount) => {
+
+    const addressURI = addressList.slice(0, Math.min(addressList.length, initMaxWordCount)).join(' ');
+
+    const suggestQuery = `text=${addressURI}, ${comunaURI}, ${provinceURI}&f=json&token=${apiKey}&countryCode=${countryURI}&category=Address`;
+    let url = `https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?${suggestQuery}`;
+  
+    console.log("addressURI", addressURI)
+
+    try {
+      const response = await axios.get(url);
+      if (response.status === 200) {
+        const list = response.data.suggestions;
+        if (list.length !== 0) {
+          return list[0].text;
+        } else {
+          return undefined;
+        }
+      } else {
+        console.log('auto suggest by ARCGIS response not 200');
+        return undefined;
+      }
+    } catch (err) {
+      console.log('auto suggest Error', err);
+      return undefined;
+    }
+  } 
+  let result = undefined
+  let limitCount = 3
+  let initMaxWordCount = 7
+
+  while (result == undefined && initMaxWordCount >= limitCount){
+    result = await getSuggest(addressWordList, initMaxWordCount)
+    initMaxWordCount = initMaxWordCount - 2
+  }
+  return result
+}
 
 export async function searchAddressByARCGIS(place: string) {
   const addressInURI = encodeURIComponent(place);

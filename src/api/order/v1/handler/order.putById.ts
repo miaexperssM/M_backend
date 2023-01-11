@@ -8,7 +8,7 @@ import {
   isInPolygon,
 } from 'utils/calculationHelper';
 import sendError from 'utils/error';
-import { searchAddressByARCGIS } from 'utils/mapServices/ArcGisService';
+import { autoSuggest, searchAddressByARCGIS } from 'utils/mapServices/ArcGisService';
 
 interface OrderPutByIdParams {
   id: number;
@@ -46,7 +46,8 @@ export async function orderPutByIdHandler(req: Request, res: Response, next: Nex
 
     const body: OrderPutByIdBody = req.body;
 
-    const address = getAddressStringByOrder(body);
+    const suggestAddress = await autoSuggest(body.address, body.comuna, body.province, body.destinationCountry);
+    const address = suggestAddress == undefined ? getAddressStringByOrder(body) : suggestAddress;
 
     let zoneId = -1;
     let placeId = '';
