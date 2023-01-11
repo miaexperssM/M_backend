@@ -93,11 +93,11 @@ export async function autoSuggest(address: string, comuna: string, province: str
   } 
   let result = undefined
   let limitCount = 3
-  let initMaxWordCount = 7
+  let initMaxWordCount = 6
 
   while (result == undefined && initMaxWordCount >= limitCount){
     result = await getSuggest(addressWordList, initMaxWordCount)
-    initMaxWordCount = initMaxWordCount - 2
+    initMaxWordCount = initMaxWordCount - 3
   }
   return result
 }
