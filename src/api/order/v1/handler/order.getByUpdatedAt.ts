@@ -19,7 +19,7 @@ export async function orderGetByUpdatedAtHandler(req: Request, res: Response, ne
     .from(Order, 'order')
     .orderBy('id', 'DESC')
     .where('isDeleted = :isDeleted', { isDeleted: false })
-    .take(5000)
+    .take(10000)
     .getMany();
 
   const zoneList = await getConnection()
