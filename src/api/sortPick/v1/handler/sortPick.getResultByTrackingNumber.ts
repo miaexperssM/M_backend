@@ -22,6 +22,7 @@ interface resultJson {
   address: string | undefined;
   zoneTitle?: string | undefined;
   route: number;
+  isManualZoneSelection: boolean
 }
 
 export async function getLevel1ResultByTrackingNumberHandler(req: Request, res: Response, next: NextFunction) {
@@ -35,6 +36,7 @@ export async function getLevel1ResultByTrackingNumberHandler(req: Request, res: 
       message: `Not found order by ${params.trackingNumber}, Resaon: ${result.reason}`,
       address: '',
       route: result.port,
+      isManualZoneSelection: false
     };
     res.status(200).json(json);
   } else if (result.port) {
@@ -44,6 +46,7 @@ export async function getLevel1ResultByTrackingNumberHandler(req: Request, res: 
       message: `Get ${params.trackingNumber} sortPick route at ${result.port}, Reason:${result.reason}`,
       address: getAddressStringByOrder(result.order),
       route: result.port,
+      isManualZoneSelection: result.order?.isManualZoneSelection || false
     };
     res.status(200).json(json);
   } else {
@@ -64,6 +67,7 @@ export async function getLevel2ResultByTrackingNumberHandler(req: Request, res: 
       address: '',
       zoneTitle: '',
       route: result.port,
+      isManualZoneSelection: false
     };
     res.status(200).json(json);
   } else if (result.port) {
@@ -75,6 +79,7 @@ export async function getLevel2ResultByTrackingNumberHandler(req: Request, res: 
       address: getAddressStringByOrder(result.order),
       zoneTitle: zone?.title || "",
       route: result.port,
+      isManualZoneSelection: result.order?.isManualZoneSelection || false
     };
     res.status(200).json(json);
   } else {

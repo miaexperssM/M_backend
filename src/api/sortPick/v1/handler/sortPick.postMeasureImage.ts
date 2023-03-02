@@ -22,6 +22,7 @@ interface resultJson {
   address: string | undefined;
   zoneTitle?: string
   route: number;
+  isManualZoneSelection: boolean
 }
 
 interface PostMeasuerImagebody {
@@ -38,6 +39,8 @@ export async function postMeasureImageHandler(req: Request, res: Response, next:
 
   const location = imageUpload(body.image, body.barcode)
 
+  order.isImageUploaded = true
+
   const newOrder = await getRepository(Order).save(order);
 
   let json1: resultJson = {
@@ -46,6 +49,7 @@ export async function postMeasureImageHandler(req: Request, res: Response, next:
     message: 'Error',
     address: '',
     route: 12,
+    isManualZoneSelection: false
   };
 
   let json2: resultJson = {
@@ -55,6 +59,7 @@ export async function postMeasureImageHandler(req: Request, res: Response, next:
     address: '',
     zoneTitle: '',
     route: 12,
+    isManualZoneSelection: false
   };
   const address = getAddressStringByOrder(order);
 
@@ -66,6 +71,7 @@ export async function postMeasureImageHandler(req: Request, res: Response, next:
       message: `Get ${newOrder.trackingNumber} sortPick route at ${result1.port}, Reason:${result1.reason}`,
       address,
       route: result1.port,
+      isManualZoneSelection: newOrder.isManualZoneSelection
     };
   }
 
@@ -79,6 +85,7 @@ export async function postMeasureImageHandler(req: Request, res: Response, next:
       address,
       zoneTitle: zone?.title || "",
       route: result2.port,
+      isManualZoneSelection: newOrder.isManualZoneSelection
     };
   }
 

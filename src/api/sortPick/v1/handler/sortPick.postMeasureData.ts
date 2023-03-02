@@ -19,8 +19,9 @@ interface resultJson {
   pickingLevel: number;
   message: string;
   address: string | undefined;
-  zoneTitle?: string
+  zoneTitle?: string;
   route: number;
+  isManualZoneSelection: boolean;
 }
 
 interface PostMeasuerDataBody {
@@ -51,6 +52,7 @@ export async function postMeasureDataHandler(req: Request, res: Response, next: 
     message: 'Error',
     address: '',
     route: 12,
+    isManualZoneSelection: false,
   };
 
   let json2: resultJson = {
@@ -60,6 +62,7 @@ export async function postMeasureDataHandler(req: Request, res: Response, next: 
     address: '',
     zoneTitle: '',
     route: 12,
+    isManualZoneSelection: false,
   };
   const address = getAddressStringByOrder(order);
 
@@ -71,6 +74,7 @@ export async function postMeasureDataHandler(req: Request, res: Response, next: 
       message: `Get ${newOrder.trackingNumber} sortPick route at ${result1.port}, Reason:${result1.reason}`,
       address,
       route: result1.port,
+      isManualZoneSelection: newOrder.isManualZoneSelection,
     };
   }
 
@@ -82,18 +86,16 @@ export async function postMeasureDataHandler(req: Request, res: Response, next: 
       pickingLevel: 2,
       message: `Get ${newOrder.trackingNumber} sortPick route at ${result2.port}, Reason:${result2.reason}`,
       address,
-      zoneTitle: zone?.title || "",
+      zoneTitle: zone?.title || '',
       route: result2.port,
+      isManualZoneSelection: newOrder.isManualZoneSelection,
     };
   }
 
   const result = {
     status: status.OK,
-    picking: [
-      json1,
-      json2
-    ]
-  }
+    picking: [json1, json2],
+  };
 
   res.status(201).json(result);
 }

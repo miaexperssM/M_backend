@@ -270,6 +270,21 @@ export const orderPutByIdValidator = celebrate({
   },
 });
 
+export const orderPutByIdWithZoneIdValidator = celebrate({
+  params: {
+    id: Joi.number()
+      .integer()
+      .positive()
+      .required(),
+  },
+  body: {
+    zoneId:  Joi.number()
+    .integer()
+    .positive()
+    .required(),
+  },
+});
+
 export const orderDelByIdValidator = celebrate({
   params: {
     id: Joi.number()

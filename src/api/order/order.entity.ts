@@ -90,6 +90,12 @@ export class Order extends CommonEntity {
   @Column('int', { nullable: true })
   public updatedBy: number;
 
+  @Column('boolean', { default: 0 })
+  public isImageUploaded: boolean;
+
+  @Column('boolean', { default: 0 })
+  public isManualZoneSelection: boolean;
+
   @Column({ type: 'timestamp', nullable: true })
   public expiredDate: Date;
 }

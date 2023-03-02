@@ -42,6 +42,7 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   let zoneId = -1;
   let placeId = '';
   let locationStr = '';
+  let score = 0;
 
   //  ================     Google Service      ==================
   // const orderLoactionArray = await geoCodeingByGoogle(address, countryCode);
@@ -73,6 +74,7 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
       if (zone) {
         zoneId = zone.id;
       }
+      score = orderLoactionJson.score;
       locationStr = JSON.stringify(orderLoactionJson);
     }
   } else {
@@ -111,7 +113,7 @@ export async function orderPostHandler(req: Request, res: Response, next: NextFu
   });
   const order = await getRepository(Order).save(newOrder);
 
-  res.status(201).json(order);
+  res.status(201).json({...order, score});
 }
 
 export async function orderPostListHandler(req: Request, res: Response, next: NextFunction) {
@@ -139,6 +141,7 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
     let zoneId = -1;
     let placeId = '';
     let locationStr = '';
+    let score = 0
 
     //  ================     Google Service      ==================
 
@@ -171,6 +174,7 @@ export async function orderPostListHandler(req: Request, res: Response, next: Ne
         if (zone) {
           zoneId = zone.id;
         }
+        score = orderLoactionJson.score
         locationStr = JSON.stringify(orderLoactionJson);
       }
     } else {

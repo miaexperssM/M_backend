@@ -17,8 +17,10 @@ import {
   orderGetByUpdatedAtValidator,
   orderPostListValidator,
   orderPostByTrackingNumberListValidator,
+  orderPutByIdWithZoneIdValidator,
 } from './order.validator';
 import { orderPostByTrackingNumberListHandler } from './handler/order.postByTrackingNumberList';
+import { orderPutByIdWithZoneIdHandler } from './handler/order.putByIdWithZoneId';
 
 export const routes: CommonRoute[] = [
   {
@@ -77,6 +79,13 @@ export const routes: CommonRoute[] = [
     auth: true,
     validator: orderPutByIdValidator,
     handler: orderPutByIdHandler,
+  },
+  {
+    path: '/ordersWithZoneId/:id',
+    method: 'put',
+    auth: true,
+    validator: orderPutByIdWithZoneIdValidator,
+    handler: orderPutByIdWithZoneIdHandler,
   },
   {
     path: '/orders/:id',
