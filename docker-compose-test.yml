@@ -17,6 +17,11 @@ services:
       - DB_PASSWORD=example
       - DB_NAME=test
       - DB_SYNC=true
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
 
   mysql:
     image: mysql:latest
@@ -30,11 +35,22 @@ services:
       MYSQL_DATABASE: test
       MYSQL_USER: test
       MYSQL_PASSWORD: test
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
+
   adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
 
 networks:
   webnet:

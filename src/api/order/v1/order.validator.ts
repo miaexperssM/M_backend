@@ -278,10 +278,12 @@ export const orderPutByIdWithZoneIdValidator = celebrate({
       .required(),
   },
   body: {
-    zoneId:  Joi.number()
-    .integer()
-    .positive()
-    .required(),
+    zoneId: Joi.number()
+      .integer()
+      .positive()
+      .allow(0)
+      .allow(-1)
+      .required(),
   },
 });
 

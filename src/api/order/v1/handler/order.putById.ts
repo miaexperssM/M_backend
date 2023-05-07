@@ -78,65 +78,92 @@ export async function orderPutByIdHandler(req: Request, res: Response, next: Nex
 
       res.status(201).json(newOrder);
     } else {
-      const suggestAddress = await autoSuggest(body.address, body.comuna, body.province, body.destinationCountry);
-      const address = suggestAddress == undefined ? getAddressStringByOrder(body) : suggestAddress;
+      // History search
 
-      let zoneId = -1;
-      let placeId = '';
-      let locationStr = '';
-      let score = 0;
+      const historyLocationList = await getRepository(Order).find({
+        address: body.address,
+        comuna: body.comuna,
+        province: body.province,
+        isManualZoneSelection: true,
+        isDeleted: false,
+      });
 
-      const orderLoactionArray = await searchAddressByARCGIS(address);
-      if (orderLoactionArray.length !== 0) {
-        const orderLoactionJson = orderLoactionArray[0];
-        const lnglat = orderLoactionJson?.Location?.DisplayPosition
-          ? {
-              lng: orderLoactionJson.Location.DisplayPosition.Longitude,
-              lat: orderLoactionJson.Location.DisplayPosition.Latitude,
-            }
-          : undefined;
-        if (lnglat) {
-          const zone = await findZoneByPlaceLocation(lnglat);
-          if (zone) {
-            zoneId = zone.id;
-          }
-          locationStr = JSON.stringify(orderLoactionJson);
-        }
+      const filteredHistoryLocationList = historyLocationList.filter(o => o.id !== params.id);
+
+      if (filteredHistoryLocationList && filteredHistoryLocationList.length > 0) {
+        // if has history order can be ref
+        const historyOrderRef = filteredHistoryLocationList.sort(
+          (a, b) => a.createdAt.getMilliseconds() - b.createdAt.getMilliseconds(),
+        )[0];
+
+        order.placeIdInGoogle = historyOrderRef.placeIdInGoogle;
+        order.zoneId = historyOrderRef.zoneId;
+        order.location = historyOrderRef.location;
+        order.isManualZoneSelection = true;
+
+        const newOrder = await getRepository(Order).save(order);
+        res.status(201).json(newOrder);
       } else {
-        console.log("haven't found location by ArcGIS");
+        const suggestAddress = await autoSuggest(body.address, body.comuna, body.province, body.destinationCountry);
+        const address = suggestAddress == undefined ? getAddressStringByOrder(body) : suggestAddress;
+
+        let zoneId = -1;
+        let placeId = '';
+        let locationStr = '';
+        let score = 0;
+
+        const orderLoactionArray = await searchAddressByARCGIS(address);
+        if (orderLoactionArray.length !== 0) {
+          const orderLoactionJson = orderLoactionArray[0];
+          const lnglat = orderLoactionJson?.Location?.DisplayPosition
+            ? {
+                lng: orderLoactionJson.Location.DisplayPosition.Longitude,
+                lat: orderLoactionJson.Location.DisplayPosition.Latitude,
+              }
+            : undefined;
+          if (lnglat) {
+            const zone = await findZoneByPlaceLocation(lnglat);
+            if (zone) {
+              zoneId = zone.id;
+            }
+            locationStr = JSON.stringify(orderLoactionJson);
+          }
+        } else {
+          console.log("haven't found location by ArcGIS");
+        }
+
+        order.MAWB = body.MAWB;
+        order.containerNumber = body.containerNumber;
+        order.trackingNumber = body.trackingNumber;
+        order.shipper = body.shipper;
+        order.shipperPhoneNumber = body.shipperPhoneNumber;
+        order.shipperAddress = body.shipperAddress;
+        order.destinationCountry = body.destinationCountry;
+        order.recipient = body.recipient;
+        order.RUT = body.RUT;
+        order.recipientPhoneNumber = body.recipientPhoneNumber;
+        order.recipientEmail = body.recipientEmail;
+        order.region = body.region;
+        order.province = body.province;
+        order.comuna = body.comuna;
+        order.address = body.address;
+        order.weight = body.weight;
+        order.height = body.height;
+        order.length = body.length;
+        order.width = body.width;
+        order.value = body.value;
+        order.description = body.description;
+        order.quantity = body.quantity;
+        order.createdBy = req.user.id;
+        order.placeIdInGoogle = placeId;
+        order.zoneId = zoneId;
+        order.location = locationStr;
+        order.isManualZoneSelection = false;
+
+        const newOrder = await getRepository(Order).save(order);
+
+        res.status(201).json(newOrder);
       }
-
-      order.MAWB = body.MAWB;
-      order.containerNumber = body.containerNumber;
-      order.trackingNumber = body.trackingNumber;
-      order.shipper = body.shipper;
-      order.shipperPhoneNumber = body.shipperPhoneNumber;
-      order.shipperAddress = body.shipperAddress;
-      order.destinationCountry = body.destinationCountry;
-      order.recipient = body.recipient;
-      order.RUT = body.RUT;
-      order.recipientPhoneNumber = body.recipientPhoneNumber;
-      order.recipientEmail = body.recipientEmail;
-      order.region = body.region;
-      order.province = body.province;
-      order.comuna = body.comuna;
-      order.address = body.address;
-      order.weight = body.weight;
-      order.height = body.height;
-      order.length = body.length;
-      order.width = body.width;
-      order.value = body.value;
-      order.description = body.description;
-      order.quantity = body.quantity;
-      order.createdBy = req.user.id;
-      order.placeIdInGoogle = placeId;
-      order.zoneId = zoneId;
-      order.location = locationStr;
-      order.isManualZoneSelection = false;
-
-      const newOrder = await getRepository(Order).save(order);
-
-      res.status(201).json(newOrder);
     }
   } catch (err) {
     console.log('putById Error', err);
