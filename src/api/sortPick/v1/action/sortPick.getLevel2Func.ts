@@ -10,7 +10,11 @@ export async function getLevel2ResultAction(trackingNumber: string) {
     if (orderResult.zoneId !== -1) {
       const portList = rulesList.filter(rule => rule.zoneId == orderResult.zoneId);
       if (portList.length !== 1) {
-        return await Promise.resolve({ port: 12, order: orderResult, reason: `Found ${portList.length} routes in result` });
+        return await Promise.resolve({
+          port: 12,
+          order: orderResult,
+          reason: `Found ${portList.length} routes in result`,
+        });
       } else {
         return await Promise.resolve({ port: portList[0].port, order: orderResult, reason: `OK` });
       }
@@ -19,5 +23,20 @@ export async function getLevel2ResultAction(trackingNumber: string) {
     }
   } else {
     return await Promise.resolve({ port: 12, order: undefined, reason: `Not found order` });
+  }
+}
+
+export async function getLevel2ResultByOrderAction(order: Order) {
+  const rulesList = await getRepository(SortPick).find({ pickLevel: 2, isDeleted: false });
+
+  if (order.zoneId !== -1) {
+    const portList = rulesList.filter(rule => rule.zoneId == order.zoneId);
+    if (portList.length !== 1) {
+      return await Promise.resolve({ port: 12, order: order, reason: `Found ${portList.length} routes in result` });
+    } else {
+      return await Promise.resolve({ port: portList[0].port, order: order, reason: `OK` });
+    }
+  } else {
+    return await Promise.resolve({ port: 12, order: order, reason: `Order haven't find exact location` });
   }
 }

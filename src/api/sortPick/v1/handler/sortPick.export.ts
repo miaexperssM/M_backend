@@ -3,8 +3,8 @@ import { SortPick } from 'api/sortPick/sortPick.entity';
 import { NextFunction, Request, Response } from 'express';
 import { getConnection, getRepository } from 'typeorm';
 import sendError from 'utils/error';
-import { getLevel1ResultAction } from '../action/sortPick.getLevel1Func';
-import { getLevel2ResultAction } from '../action/sortPick.getLevel2Func';
+import { getLevel1ResultAction, getLevel1ResultByOrderAction } from '../action/sortPick.getLevel1Func';
+import { getLevel2ResultAction, getLevel2ResultByOrderAction } from '../action/sortPick.getLevel2Func';
 import { getAddressStringByOrder } from 'utils/calculationHelper';
 import { Zone } from 'api/zone/zone.entity';
 
@@ -83,8 +83,8 @@ export async function exportSortPickHandler(req: Request, res: Response, next: N
   const resultList: orderResult[] = [];
 
   for (const order of orderList) {
-    const r1 = await getLevel1ResultAction(order.trackingNumber);
-    const r2 = await getLevel2ResultAction(order.trackingNumber);
+    const r1 = await getLevel1ResultByOrderAction(order);
+    const r2 = await getLevel2ResultByOrderAction(order);
 
     let res: orderResult = {
       barcode: order.trackingNumber,

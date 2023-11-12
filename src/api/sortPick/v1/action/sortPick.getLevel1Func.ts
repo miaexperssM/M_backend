@@ -8,7 +8,7 @@ export async function getLevel1ResultAction(trackingNumber: string) {
 
   if (orderResult !== undefined) {
     if (orderResult.comuna == undefined || orderResult.comuna == '') {
-      const body = { port: 12, order: orderResult, reason: `Comuna information not correct` }
+      const body = { port: 12, order: orderResult, reason: `Comuna information not correct` };
       return await Promise.resolve(body);
     }
 
@@ -29,10 +29,40 @@ export async function getLevel1ResultAction(trackingNumber: string) {
         reason: `Found ${filterByComunaList.length} routes in result`,
       });
     } else {
-      const body = { port: filterByComunaList[0].port, order: orderResult, reason: `OK` }
+      const body = { port: filterByComunaList[0].port, order: orderResult, reason: `OK` };
       return await Promise.resolve(body);
     }
   } else {
     return await Promise.resolve({ port: 12, order: undefined, reason: `Not found order` });
+  }
+}
+
+export async function getLevel1ResultByOrderAction(order: Order) {
+  const rulesList = await getRepository(SortPick).find({ pickLevel: 1, isDeleted: false });
+
+  if (order.comuna == undefined || order.comuna == '') {
+    const body = { port: 12, order: order, reason: `Comuna information not correct` };
+    return await Promise.resolve(body);
+  }
+
+  const filterByComunaList = rulesList.filter(rule => {
+    const goal = new RegExp(order.comuna, 'gi');
+    const matchResult = rule.comunaName.match(goal);
+    if (matchResult == null || matchResult.length !== 1) {
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+  if (filterByComunaList.length !== 1) {
+    return await Promise.resolve({
+      port: 12,
+      order: order,
+      reason: `Found ${filterByComunaList.length} routes in result`,
+    });
+  } else {
+    const body = { port: filterByComunaList[0].port, order: order, reason: `OK` };
+    return await Promise.resolve(body);
   }
 }
