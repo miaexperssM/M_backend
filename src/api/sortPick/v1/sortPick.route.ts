@@ -1,4 +1,5 @@
 import { deleteRuleByIdHandler } from './handler/sortPick.delById';
+import { exportSortPickHandler } from './handler/sortPick.export';
 import {
   getLevel1ResultByTrackingNumberHandler,
   getLevel2ResultByTrackingNumberHandler,
@@ -16,6 +17,7 @@ import {
   getLevelResultByTrackingNumberValidator,
   postMeasureDataValidator,
   postMeasureImageValidator,
+  exportSortPickValidator,
 } from './sortPick.validator';
 
 export const routes: CommonRoute[] = [
@@ -71,15 +73,21 @@ export const routes: CommonRoute[] = [
     method: 'post',
     auth: true,
     validator: postMeasureDataValidator,
-    handler: postMeasureDataHandler
-  },  
+    handler: postMeasureDataHandler,
+  },
   // measure image post
   {
     path: '/sortPick/image',
     method: 'post',
     auth: true,
     validator: postMeasureImageValidator,
-    handler: postMeasureImageHandler
-  }
-
+    handler: postMeasureImageHandler,
+  },
+  {
+    path: '/sortPick/export/startTime/:startTime/endTime/:endTime',
+    method: 'get',
+    auth: true,
+    validator: exportSortPickValidator,
+    handler: exportSortPickHandler,
+  },
 ];

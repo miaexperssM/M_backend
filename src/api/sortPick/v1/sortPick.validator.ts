@@ -90,3 +90,18 @@ export const postMeasureImageValidator = celebrate({
       .required(),
   },
 });
+
+export const exportSortPickValidator = celebrate({
+  params: {
+    startTime: Joi.alternatives().try(Joi.string(), Joi.number()),
+    endTime: Joi.alternatives().try(Joi.string(), Joi.number()),
+  },
+  query: {
+    limit: Joi.number()
+      .integer()
+      .positive()
+      .required(),
+    offset: Joi.number().integer(),
+    type: Joi.string(),
+  },
+});
