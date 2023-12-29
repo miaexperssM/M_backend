@@ -11,7 +11,7 @@ export function mountMiddlewares(app: Express) {
   app.use(helmet());
   app.use(
     bodyParser.json({
-      limit: '1mb',
+      limit: '5mb',
     }),
   );
 
